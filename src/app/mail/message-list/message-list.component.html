@@ -1,0 +1,126 @@
+<div class="box box-solid mail-list-item" [id]="message.id"
+     [contextMenu]="mailBulk.length > 1 ? bulkMenu : basicMenu"
+     [contextMenuSubject]="message"
+     (contextmenu)="onRightClick(message)"
+     *ngFor="let message of messages;let i =index"
+     [class.selected]="message === selectedMessage || mailBulk.indexOf(message) !== -1"
+     [class.unread]="message.unread"
+     (click)="selectMsg(message,i, $event)"
+     dnd-draggable
+     [dragEnabled]="true"
+     [dropZones]="['Important', 'Spam', 'Trash']"
+     [dragData]="mailBulk.length > 0 ? mailBulk : message"
+     [hidden]="message.id === emailWithAction?.id"
+     (dblclick)="openMessageModal(message)">
+  <div class="box-header">
+    <div class="mail-description">
+      <div class="date">{{ message.sentTime | mailDate }}
+        <span *ngIf="message.files.length > 0"> <i class="fa fa-paperclip"></i></span>
+        <span *ngIf="message.replied"><i class="fa fa-reply" aria-hidden="true"></i></span>
+        <span *ngIf="message.forwarded"><i class="fa fa-share" aria-hidden="true"></i></span>
+        <span *ngIf="message.pinned" (click)="pinMessage($event, message)"><i class="fa fa-thumb-tack"></i></span>
+      </div>
+      <!-- (begin) Control icon block which shown when hover single email in a list -->
+      <div class="hover-icons pull-right">
+        <i class="fa" [ngClass]="{'fa-star': message.starred, 'fa-star-o': !message.starred}" (click)="starMessage(message)"></i>
+        <i class="fa fa-trash-o" (click)="deleteMessage(message)"></i>
+        <i class="fa" [ngClass]="{'fa-envelope-open-o': message.unread, 'fa-envelope-o': !message.unread}"></i>
+        <i class="fa" *ngIf="(currentFolder !== 'trash') && (currentFolder !== 'spam') && (currentFolder !== 'search')" [ngClass]="{'fa-thumb-tack': message.pinned, 'fa fa-thumb-tack': !message.pinned}" (click)="pinMessage($event, message)"></i>
+      </div>
+      <!-- (end) Control icon block which shown when hover single email in a list -->
+
+      <app-user-avatar class="middle-sized" [contact]="message.from"></app-user-avatar>
+
+      <!-- (begin) Mail list email view. Top header line for all folders except Draft / Sent -->
+      <div class="username" *ngIf="!(folder === 'drafts' || folder === 'sent')">
+        {{ message.from?.name }}
+      </div>
+      <!-- (end) Mail list email view. Top header line for all folders except Draft / Sent -->
+
+      <!-- (begin) Mail list email view. Top header line for Draft / Sent folders -->
+      <div class="username" *ngIf="folder === 'drafts' || folder === 'sent'">
+          {{ userNames(message.to) }}
+      </div>
+      <!-- (end) Mail list email view. Top header line for Draft / Sent folders -->
+
+      <div class="subject">{{message.subject}}</div>
+      <div class="message-line" [ngClass]="{'search-preview': folder === 'search' }" [innerHTML]="message.snippet" ></div>
+    </div>
+  </div>
+</div>
+<context-menu *ngIf="currentFolder !== 'trash'">
+  <ng-template contextMenuItem (execute)="snoozeMessage($event.item)">
+    <i class="fa fa-bell" aria-hidden="true"></i>
+    Snooze
+  </ng-template>
+
+  <ng-template contextMenuItem (execute)="reply($event.item)">
+    <i class="fa fa-mail-reply"></i>
+    Reply
+  </ng-template>
+
+  <ng-template [visible]="showReplyAll" contextMenuItem (execute)="replyAll($event.item)">
+    <i class="fa fa-mail-reply-all"></i>
+    Reply All
+  </ng-template>
+
+  <ng-template contextMenuItem (execute)="forwardMessage($event.item)">
+    <i class="fa fa-mail-forward"></i>
+    Forward
+  </ng-template>
+
+  <ng-template contextMenuItem *ngIf="!isImportant" (execute)="markAsImportant($event.item)">
+    <i class="fa fa-tag"></i>
+    Mark as Important
+  </ng-template>
+
+  <ng-template contextMenuItem (execute)="selectForBulk($event.item)">
+    <i class="fa fa-check"></i>
+    Select
+  </ng-template>
+
+  <ng-template  [visible]="isUnread" contextMenuItem (execute)="markMessageAsReadUnread($event.item)">
+    <i class="fa fa-envelope-open-o"></i>
+    Mark As Read
+  </ng-template>
+
+  <ng-template [visible]="!isUnread" contextMenuItem (execute)="markMessageAsReadUnread($event.item)">
+    <i class="fa fa-envelope-open-o"></i>
+    Mark As UnRead
+  </ng-template>
+
+  <ng-template contextMenuItem [visible]="isPinnedMessage" (execute)="moveMessageToSpam($event.item)">
+    <i class="fa fa-exclamation-triangle"></i>
+    Move to Spam
+  </ng-template>
+
+  <ng-template contextMenuItem [visible]="isPinnedMessage" (execute)="moveMessageToTrash($event.item)">
+    <i class="fa fa-trash-o"></i>
+    Move to trash
+  </ng-template>
+
+</context-menu>
+
+<context-menu *ngIf="currentFolder === 'trash'">
+  <ng-template contextMenuItem (execute)="moveMessageToInbox($event.item)">
+    <i class="fa fa-inbox"></i>
+    Move to inbox
+  </ng-template>
+  <ng-template contextMenuItem (execute)="deleteMessage($event.item)">
+    <i class="fa fa-trash-o"></i>
+    Delete forever
+  </ng-template>
+</context-menu>
+
+<context-menu #bulkMenu>
+  <!-- Context-Menu for bulk of messages -->
+  <ng-template contextMenuItem (execute)="resetMailBulk()">
+    <i class="fa fa-check-circle"></i>
+    Reset All Selections
+  </ng-template>
+
+  <ng-template contextMenuItem (execute)="deleteAllInBulk()">
+    <i class="fa fa-trash-o"></i>
+    Delete Selected Messages
+  </ng-template>
+</context-menu>

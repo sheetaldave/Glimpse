@@ -1,0 +1,19 @@
+<header class="main-header">
+  <app-nav-bar search="true"></app-nav-bar>
+</header>
+<div class="mailbox-wrapper">
+  <split direction="horizontal" [gutterSize]="2" (dragProgress)="onDragProgress($event)" (dragEnd)="onDragEnd($event)">
+    <split-area [sizePixel]="splitSidebarSize ? null : (minimizeMenu ? 50 : 200)"
+                [size]="splitSidebarSize"
+                [minSizePixel]="50"
+                class="sidebar-shadow">
+      <aside>
+        <app-mail-side-bar></app-mail-side-bar>
+      </aside>
+    </split-area>
+    <split-area [autoSize]="true" class="split-mail-list">
+      <app-mail-list></app-mail-list>
+    </split-area>
+  </split>
+</div>
+

@@ -1,0 +1,17 @@
+<header class="main-header">
+  <app-nav-bar></app-nav-bar>
+</header>
+<div class="content-wrapper">
+  <split direction="horizontal" [gutterSize]="2">
+    <split-area [size]="15" class="sidebar-shadow">
+      <aside>
+        <app-account-side-bar></app-account-side-bar>
+      </aside>
+    </split-area>
+    <split-area [size]="85">
+      <section class="content with-padding">
+        <router-outlet></router-outlet>
+      </section>
+    </split-area>
+  </split>
+</div>

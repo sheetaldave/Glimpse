@@ -1,0 +1,27 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    {{ 'Message from ' + message?.from?.name ? message?.from?.name : message?.from?.email }}
+  </h4>
+  <button type="button"
+          class="btn btn-link btn-nav-modal"
+          [ngClass]="{active: isShowKnowledgePanel}"
+          (click)="isShowKnowledgePanel = !isShowKnowledgePanel">
+    <i class="fa fa-bars"></i>
+  </button>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body" *ngIf="message">
+  <split direction="horizontal" [gutterSize]="5" [visibleTransition]="true">
+    <split-area [size]="70" id="mail-content">
+      <app-mail-content [selectedMessage]="message" [(selectedContact)]="selectedContact" (topicSelected)="selectedTopic = $event" (onReply)="onReplayMessage($event)"></app-mail-content>
+      <div *ngIf="message?.thread_id">
+        <app-mail-thread [thread]="message.thread_id" [ignoreMessage]="message.id"></app-mail-thread>
+      </div>
+    </split-area>
+    <split-area [visible]="isShowKnowledgePanel" [size]="30" id="mail-content">
+      <app-mail-knowledge class="modal-mail-knowledge" [message]="message" [(contact)]="selectedContact" [topic]="selectedTopic?.name"></app-mail-knowledge>
+    </split-area>
+  </split>
+</div>

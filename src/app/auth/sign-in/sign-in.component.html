@@ -1,0 +1,54 @@
+<div class="login-box-wrapper">
+  <div class="login-box">
+    <div class="login-logo">
+      <a href="#"><img src="assets/logo-large.svg"/></a>
+    </div>
+    <!-- /.login-logo -->
+    <div class="login-box-body">
+      <h1 class="login-box-welcome-msg">WELCOME</h1>
+      <h2 class="login-box-msg">Login via your Google Mail Account</h2>
+
+      <div *ngIf="false">
+        <div class="form-group has-feedback" [class.has-error]="loginError">
+          <input type="email" class="form-control" placeholder="Email" [(ngModel)]="login"/>
+          <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback" [class.has-error]="passwordError">
+          <input type="password" class="form-control" placeholder="Password" [(ngModel)]="password"/>
+          <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+        </div>
+        <div class="row">
+          <div class="col-xs-8">
+            <div class="checkbox icheck">
+              <label class="">
+                <div>
+                  <input type="checkbox"/>
+                </div>
+                Remember Me
+              </label>
+            </div>
+          </div>
+          <!-- /.col -->
+          <div class="col-xs-4">
+            <button type="submit" class="btn btn-primary btn-block" (click)="submitForm()">Sign In</button>
+          </div>
+          <!-- /.col -->
+        </div>
+
+        <a routerLink="/">I forgot my password</a><br>
+        <a routerLink="/" class="text-center">Register a new membership</a>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-login" (click)="googleSignIn()"><span class="icon-google-g-logo"></span>Login Via
+          Google
+        </button>
+      </div>
+      <div class="alert alert-warning" *ngIf="emailNotAllowed">Hey there!<br>Unfortunately, your email has not been authorized on our systems yet. But don't worry, we are working hard to get people access. If you haven't requested access yet, please go sign up at <a href="http://glimpse.email">http://glimpse.email</a>.<br><br>Thank you and see you soon!</div>
+      <div class="alert alert-danger" *ngIf="errorMessage">{{errorMessage}}</div>
+      <div class="loader" *ngIf="loading"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+    </div>
+    <!-- /.login-box-body -->
+  </div>
+  <div class="copyright">© 2017 Deepframe</div>
+</div>
+

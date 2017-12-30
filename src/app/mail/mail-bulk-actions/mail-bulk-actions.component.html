@@ -1,0 +1,34 @@
+<div class="mail-bulk-actions container">
+  <div class="bulk-header">
+    <h3 class="pull-left">{{ 'Selected ' + messages.length + ' messages '}} </h3>
+    <a class="pull-right" (click)="clearBulk()">Reset Selections <i class="fa fa-close"></i></a>
+  </div>
+  <div class="">
+    <p class="placeholder">Hold 'ctrl' key when clicking on message to select</p>
+    <p class="placeholder">Hold 'shift' to select bulk messages from last picked one</p>
+  </div>
+  <div class="actions container">
+
+    <div class="action-item">
+      <a class="btn btn-default" (click)="moveMessages(messages, 'trash')">
+        <i class="fa fa-trash"></i>
+        Delete {{messages.length}} Messages
+      </a>
+    </div>
+
+    <div class="action-item">
+      <a class="btn btn-default" (click)="moveMessages(messages, 'important')">
+        <i class="fa fa-star"></i>
+        Mark {{messages.length}} Messages As Important
+      </a>
+    </div>
+
+    <div class="action-item">
+      <a class="btn btn-default" (click)="moveMessages(messages, 'spam')">
+        <i class="fa fa-exclamation-triangle"></i>
+        Move {{messages.length}} Messages To Spam
+      </a>
+    </div>
+
+  </div>
+</div>

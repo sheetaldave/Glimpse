@@ -1,0 +1,30 @@
+<section class="sidebar" *ngIf="minimizedMailboxMenu" [ngClass]="{active: minimizedMailboxMenu}">
+  <li class="bg-purple-active">
+    <a><i *ngIf="minimizedMailboxMenu" class="fa fa-envelope fa-big"></i></a>
+  </li>
+  <ul class="nav nav-pills nav-stacked">
+    <li *ngFor="let folder of folders">
+      <a [routerLink]="['/insights', folder.id]" routerLinkActive="active">
+        <i class="fa fa-big fa-{{folder.icon}}"></i>
+      </a>
+    </li>
+  </ul>
+</section>
+<section class="sidebar" *ngIf="!minimizedMailboxMenu">
+  <a (click)="composeNewMessage($event)" class="btn btn-default btn-block btn-compose">
+    <span> <i class="fa fa-envelope"></i> </span>
+    <span>Compose</span>
+  </a>
+  <ul class="nav nav-pills nav-stacked">
+    <li *ngFor="let folder of folders" dnd-droppable [dropZones]="[folder.name]"
+        (onDropSuccess)="handleDrop($event, folder.id)">
+      <a [routerLink]="['/insights', folder.id]" routerLinkActive="active">
+        <i class="fa fa-{{folder.icon}}"></i>&nbsp;{{folder.name}}
+        <span class="badge pull-right" *ngIf="folder.unreadMails">{{folder.unreadMails}}</span>
+      </a>
+    </li>
+  </ul>
+</section>
+
+
+

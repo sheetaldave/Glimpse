@@ -1,0 +1,239 @@
+<section class="content mail-content">
+  <div class="box box-solid box-col" *ngIf="selectedMessage">
+    <div class="box-header">
+      <h3 class="box-title"></h3>
+      <div class="pull-left btn-group mail-controls">
+        <button type="button"
+                class="btn btn-box-tool btn-sm"
+                (click)="starMessage(selectedMessage)">
+          <i class="fa" [ngClass]="{'fa-star': selectedMessage.starred, 'fa-star-o': !selectedMessage.starred}"></i>
+        </button>
+        <button type="button"
+                class="btn btn-box-tool btn-sm"
+                (click)="moveMessageToTrash(selectedMessage)">
+          <i class="fa fa-trash"></i>
+        </button>
+        <button type="button"
+                class="btn btn-box-tool btn-sm"
+                *ngIf="selectedMessage.files.length > 0"
+                placement="bottom"
+                [popover]="attachmentsDropdown"
+                [outsideClick]="true"
+                #popAttachment="bs-popover">
+          <i class="fa fa-paperclip"></i>
+        </button>
+        <button type="button"
+                class="btn btn-box-tool btn-sm"
+                *ngIf="selectedMessage.replied"><i class="fa fa-reply" aria-hidden="true"></i>
+        </button>
+        <button type="button"
+                class="btn btn-box-tool btn-sm"
+                *ngIf="selectedMessage.forwarded"><i class="fa fa-share" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <!-- Attachments dropdown in the reading pane -->
+      <!-- TODO: Code could be refactored as single directive/component with
+            a bottom attachments list if on click behaviour will not change further
+      -->
+      <ng-template #attachmentsDropdown>
+        <ul class="attachments_list">
+          <li *ngFor="let file of selectedMessage.files"
+            class="attachments_list__item"
+            [contextMenu]="fileMenu"
+            [contextMenuSubject]="file.url">
+            <span class="mailbox-attachment-icon"><i [class]="attachmentIcon(file.type)"></i></span>
+            <div class="mailbox-attachment-info">
+              <a (click)="openAttachmentModal(file, $event)">
+                <span class="attachment-title"><i class="fa fa-paperclip"></i> {{ file.name }} <i *ngIf="file.name?.length < 1">No name</i></span>
+                <span class="mailbox-attachment-size">
+                    {{file.size/1000}} KB
+                  </span>
+              </a>
+            </div>
+          </li>
+        </ul>
+      </ng-template>
+      <!-- end Attachments dropdown  in the reading pane -->
+
+      <div class="mail-sent-time">
+        <p>
+          {{ selectedMessage.sentTime | mailDate }}
+        </p>
+      </div>
+      <div class="box-tools pull-right btn-group" dropdown>
+        <button type="button"
+                class="btn btn-box-tool btn-default btn-sm"
+                (click)="reply(selectedMessage)">
+          <i class="icon icon-replay"></i>
+        </button>
+        <button dropdownToggle
+                type="button"
+                class="btn  dropdown-toggle dropdown-toggle-split btn-box-tool btn-default btn-sm">
+          <i class="fa fa-caret-down fa-2x"></i>
+        </button>
+        <ul *dropdownMenu class="dropdown-menu context-menu-dropdown" role="menu">
+          <li role="menuitem"
+              class="dropdown-item"
+              (click)="snoozeMessage(selectedMessage)">
+            <i class="fa fa-bell" aria-hidden="true"></i>
+            Snooze
+          </li>
+          <li role="menuitem"
+              class="dropdown-item"
+              *ngIf="selectedMessage.participants.length > 2"
+              (click)="replyAll(selectedMessage)">
+            <i class="fa fa-mail-reply-all"></i>
+            Reply All
+          </li>
+          <li role="menuitem"
+              class="dropdown-item"
+              (click)="forwardMessage(selectedMessage)">
+            <i class="fa fa-mail-forward"></i>
+            Forward
+          </li>
+          <li role="menuitem"
+              class="dropdown-item"
+              (click)="moveMessageToSpam(selectedMessage)">
+            <i class="fa fa-exclamation-triangle"></i>
+            Move to Spam
+          </li>
+          <li role="menuitem"
+              class="dropdown-item"
+              (click)="moveMessageToTrash(selectedMessage)">
+            <i class="fa fa-trash-o"></i>
+            Move to trash
+          </li>
+          <li role="menuitem"
+              class="dropdown-item"
+              (click)="printMail()">
+            <i class="fa fa-print"></i>
+            Print
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div id="printArea">
+      <div class="mail-header">
+        <div class="box-header">
+          <h3 class="box-title mail-subject">{{selectedMessage.subject || '(no subject)'}}</h3>
+        </div>
+        <div class="box-header box-mail-recipient">
+          <ul class="list-inline">
+            <li>From: </li>
+            <li [ngClass]="{'selected-connection':
+                selectedMessage.from?.name === selectedContact?.name && selectedMessage.from?.email === selectedContact?.email,
+                'list-inline__item': true}"
+                (click)="selectContact(selectedMessage.from)">
+              <app-user-avatar
+                class="no-print"
+                [contact]="selectedMessage.from"
+                [showPopover]="true"
+                [contextMenu]="true">
+              </app-user-avatar>
+            </li>
+            <li>To: </li>
+            <li>
+              <app-contacts-counter-dropdown
+                [contactList]="selectedMessage.to"
+                [selectedContact]="selectedContact"
+                (selectedContactChange)="selectContact($event)">
+              </app-contacts-counter-dropdown>
+            </li>
+            <li *ngIf="selectedMessage.cc?.length > 0">CC: </li>
+            <li>
+              <app-contacts-counter-dropdown
+                [contactList]="selectedMessage.cc"
+                [selectedContact]="selectedContact"
+                (selectedContactChange)="selectContact($event)">
+              </app-contacts-counter-dropdown>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="box-header box-mail-discover">
+        <div class="mail-topics">
+          <h5>Discovered Topics</h5>
+          <div *ngIf="topics?.length < 1" class="placeholder">No topics discovered for this email</div>
+          <div *ngIf="topics?.length > 0" class="user-topics" [ngClass]="{'expanded': this.discoveredTopicsToggleState}">
+            <div *ngFor="let topic of topics | slice: 0:topicsConfig.displayTopicsAmount"
+                 [contextMenu]="topicMenu"
+                 [contextMenuSubject]="topic.name"
+                 class="topic-item"
+                 [ngClass]="{selected: topic === selectedTopic}"
+                 (click)=selectTopic(topic)>
+              {{ topic.name }} <i class="fa fa-times" *ngIf="topic === selectedTopic"></i>
+            </div>
+            <div class="topic-item" (click)="annotateTopics()"><i class="fa fa-cogs"></i></div>
+            <context-menu #topicMenu>
+              <ng-template contextMenuItem (execute)="showRelatedEmails($event.item)">
+                Related Emails
+              </ng-template>
+              <ng-template contextMenuItem (execute)="showRelatedTopics($event.item)">
+                Go to Insights Screen
+              </ng-template>
+              <ng-template contextMenuItem (execute)="showRelatedAttachments($event.item)">
+                Related Attachments
+              </ng-template>
+            </context-menu>
+          </div> <!-- end of user-topics -->
+
+          <!-- 10 topics + 1 element of Topics annotations -->
+          <div *ngIf="topics?.length > 11"
+               class="load-more--purple text-no-select" (click)="toggleTopics()">
+            {{ discoveredTopicsToggleState ? 'Hide' : 'Load more' }}
+          </div>
+
+        </div> <!-- end of mail-topics -->
+      </div>
+      <div class="box-body">
+        <div class="mail-body">
+          <app-mail-body [body]="highlightedBody"></app-mail-body>
+        </div>
+        <div class="box-footer" *ngIf="selectedMessage.files && selectedMessage.files.length > 0">
+          <ul class="mailbox-attachments clearfix">
+            <li *ngFor="let file of selectedMessage.files"
+                class="attachment"
+                [contextMenu]="fileMenu"
+                [contextMenuSubject]="file.url">
+              <span class="mailbox-attachment-icon"><i [class]="attachmentIcon(file.type)"></i></span>
+              <div class="mailbox-attachment-info">
+                <a (click)="openAttachmentModal(file, $event)">
+                  <span class="attachment-title"><i class="fa fa-paperclip"></i> {{ file.name }} <i *ngIf="file.name?.length < 1">No name</i></span>
+                  <span class="mailbox-attachment-size">
+                    {{file.size/1000}} KB
+                  </span>
+                </a>
+              </div>
+            </li>
+          </ul>
+          <context-menu #fileMenu>
+            <ng-template contextMenuItem (execute)="saveAs($event.item)">
+              Save As
+            </ng-template>
+          </context-menu>
+        </div>
+      </div>
+    </div>
+    <div class="form-group quick-mail avatar-img no-print">
+      <app-user-avatar
+        class="avatar-image"
+        [contact]="selectedMessage.from"
+        [popover]="true"
+        [contextMenu]="true">
+      </app-user-avatar>
+      <div class="instant-reply" (focus)="focusOnInstantReply()" (focusout)="focusOutInstantReply()" [class.placeholder]="showEditorPlaceholder">Type your reply here...</div>
+      <a class="attachment-icon">
+        <i class="fa fa-paperclip" aria-hidden="true"></i>
+        <i class="fa fa-refresh fa-spin fa-1x fa-fw" *ngIf="sending"></i>
+        <button class="instant-reply-btn" (click)="instantReply()" [disabled]="sending">{{ sending ? 'Sending' : 'Send' }}</button>
+        <input class="attachment-input" type="file" size="10"/>
+      </a>
+    </div>
+    <div class="box box-solid" *ngIf="!selectedMessage">
+      <div class="box-body">
+        <span class="no-data-warning">No Mail selected</span>
+      </div>
+    </div>
+  </div>
+</section>

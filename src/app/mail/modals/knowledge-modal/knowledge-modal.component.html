@@ -1,0 +1,11 @@
+<div class="modal-header" >
+  <h4 class="modal-title text-center">
+    Knowledge Pane
+  </h4>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body" *ngIf="contact">
+  <app-mail-knowledge [contact]="contact" [message]="message" [contactOnly]="contactOnly"></app-mail-knowledge>
+</div>

@@ -1,0 +1,165 @@
+<main>
+  <split direction="horizontal" [gutterSize]="3" (dragEnd)="onDragEnd($event)">
+    <split-area [size]="splitAreaSize.mailList"
+                [minSizePixel]="250">
+      <split direction="vertical" [gutterSize]="3" (dragEnd)="onDragEndVertical($event)">
+        <split-area
+          [size]="splitAreaSize.pinnedMessage"
+          [visible]="hasPinnedMessages">
+          <div class="list-of-mail">
+            <div class="content">
+              <div class="box box-solid box-bg-grey">
+                <div class="box-body box-group">
+                  <div class="mail-list-heading sticky-header">
+                    <app-mail-pagination
+                      *ngIf="pinMessagePaginationConfig.count > 2"
+                      (goNext)="onPinnedMessageNext()"
+                      (goPrevious)="onPinnedMessagePrevious()"
+                      [page]="pinMessagePaginationConfig.pageNo"
+                      [perPage]="pinMessagePaginationConfig.limit"
+                      [count]="pinMessagePaginationConfig.count">
+                    </app-mail-pagination>
+                    <span *ngIf="pinnedMessages?.length">Pinned Messages</span>
+                  </div>
+                  <app-message-list
+                    [messages]="pinnedMessages"
+                    [folder]="folder"
+                    [selectedOrder]="selectedOrder"
+                    [mailBulk]="mailBulk"
+                    [search]="search"
+                    [selectedMessage]="selectedMessage"
+                    [selectedMessageIndex]="selectedMessageIndex"
+                    [lastMessageInBulk]="lastMessageInBulk"
+                    [lastMessageInBulkIndex]="lastMessageInBulkIndex"
+                    [currentFolder]="currentFolder"
+                    (selectMessageChange)="getSelectedMessage($event)"
+                    (pinMessageEvent)="pinnedMessage($event)">
+                  </app-message-list>
+                </div>
+                <p *ngIf="pinnedMessages?.length === 0 && !loading"> {{ folder !== 'search' ? 'You don\'t have messages in this folder' : 'No results for '+ '\''+ query +'\''}}</p>
+                <div class="loader" *ngIf="loading"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+              </div>
+            </div>
+          </div>
+        </split-area>
+        <split-area [autoSize]="true"
+                    id="mail-list">
+          <div class="list-of-mail">
+            <div class="content">
+              <div class="box box-solid box-bg-grey">
+                <div class="box-body box-group">
+                  <div class="mail-list-heading sticky-header">
+            <span *ngIf="folder !== 'search'" class="pull-left" dropdown container="body">
+              <a dropdownToggle class="dropdown-toggle" (click)="false">
+                Order by: {{ selectedOrder ? ' ' + selectedOrder : ' '  }} <i class="fa fa-caret-down"></i>
+              </a>
+              <ul *dropdownMenu class="dropdown-menu" role="menu">
+                <li role="menuitem" *ngFor="let order of orders"><a class="dropdown-item" (click)="selectOrder(order)">{{ order }}</a></li>
+              </ul>
+            </span>
+                <app-mail-pagination
+                  (goNext)="onNext()"
+                  (goPrevious)="onPrevious()"
+                  [page]="mailListPaginationConfig.page"
+                  [perPage]="mailListPaginationConfig.limit"
+                  [count]="mailListPaginationConfig.total">
+                </app-mail-pagination>
+                <span *ngIf="folder === 'search' && !search">Search Results</span>
+                <span *ngIf="search">Topic Search Results</span>
+              </div>
+              <app-message-list
+                [messages]="messages"
+                [folder]="folder"
+                [selectedOrder]="selectedOrder"
+                [mailBulk]="mailBulk"
+                [page]="mailListPaginationConfig.page"
+                [search]="search"
+                [selectedMessage]="selectedMessage"
+                [selectedMessageIndex]="selectedMessageIndex"
+                [lastMessageInBulk]="lastMessageInBulk"
+                [lastMessageInBulkIndex]="lastMessageInBulkIndex"
+                (selectNextMessageEvent)="selectNextMessage($event)"
+                (selectPreviousMessageEvent)="selectPreviousMessage($event)"
+                [currentFolder]="currentFolder"
+                (selectMessageChange)="getSelectedMessage($event)"
+                (moveMessageToSpanEvent)="moveMessageToSpam($event)"
+                (moveMessageToTrashEvent)="moveMessageToTrash($event)"
+                (moveMessageToInboxEvent)="moveMessageToInbox($event)"
+                (deleteMessageEvent)="deleteMessage($event)"
+                (messageBulkChange)="clearBulk()"
+                (messageBulkActionEvent)="deleteAllInBulk()"
+                (pinMessageEvent)="pinnedMessage($event)">
+              </app-message-list>
+
+
+            </div>
+            <p class="alert-empty-mail-list" *ngIf="messages?.length === 0 && !loading"> {{ folder !== 'search' ? 'You don\'t have messages in this folder' : 'No results for '+ '\''+ query +'\''}}</p>
+            <div class="loader" *ngIf="loading"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+          </div>
+        </div>
+      </div>
+        </split-area>
+        <split-area
+                    [size]="splitAreaSize.mailListSearchVertical"
+                    [visible]="search"
+                    [minSizePixel]="250"
+                    id="search-list">
+        <div class="list-of-mail">
+          <div class="content">
+            <div class="box box-solid box-bg-grey">
+              <div class="box-body box-group">
+                <div class="mail-list-heading sticky-header" *ngIf="search">
+            <span *ngIf="folder !== 'search'" class="pull-left" dropdown container="body">
+              <a dropdownToggle class="dropdown-toggle" (click)="false">
+                Order by: {{ selectedOrder ? ' ' + selectedOrder : ' '  }} <i class="fa fa-caret-down"></i>
+              </a>
+              <ul *dropdownMenu class="dropdown-menu" role="menu">
+                <li role="menuitem" *ngFor="let order of orders"><a class="dropdown-item" (click)="selectOrder(order)">{{ order }}</a></li>
+              </ul>
+            </span>
+                  <app-mail-pagination
+                    (goNext)="onSearchNext()"
+                    (goPrevious)="onSearchPrev()"
+                    [page]="searchPaginationConfig.pageNo"
+                    [perPage]="mailListPaginationConfig.limit"
+                    [count]="searchPaginationConfig.count">
+                  </app-mail-pagination>
+                  <span *ngIf="folder === 'search'">Keyword Search Results</span>
+                </div>
+                <app-message-list
+                   [messages]="searchResult"
+                   [folder]="folder"
+                   [selectedOrder]="selectedOrder"
+                   [mailBulk]="mailBulk"
+                   [search]="search"
+                   [selectedMessage]="selectedMessage"
+                   [selectedMessageIndex]="selectedMessageIndex"
+                   [lastMessageInBulk]="lastMessageInBulk"
+                   [lastMessageInBulkIndex]="lastMessageInBulkIndex"
+                   [currentFolder]="currentFolder"
+                   (selectMessageChange)="getSelectedMessage($event)"
+                   (messageBulkChange)="clearBulk()">
+                 </app-message-list>
+              </div>
+              <p *ngIf="searchResult?.length === 0 && !loading"> {{ folder !== 'search' ? 'You don\'t have messages in this folder' : 'No results for '+ '\''+ query +'\''}}</p>
+              <div class="loader" *ngIf="loading"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+            </div>
+          </div>
+        </div>
+      </split-area>
+    </split>
+    </split-area>
+    <split-area [autoSize]="true" [minSizePixel]="300" id="mail-content">
+      <app-mail-content [ngClass]="{'has-threads': isHasThreads}" *ngIf="mailBulk?.length < 2" [selectedMessage]="selectedMessage" [(selectedContact)]="selectedContact" (topicSelected)="selectedTopic = $event"></app-mail-content>
+      <div class="mail-thread" *ngIf="selectedMessage && mailBulk?.length < 2">
+        <app-mail-thread (isHasThreads)="hasThreads($event)" [thread]="selectedMessage.thread" [ignoreMessage]="selectedMessage.id" (topicSelected)="selectedTopic = $event"></app-mail-thread>
+      </div>
+      <div *ngIf="mailBulk?.length > 1">
+        <app-mail-bulk-actions  [messages]="mailBulk" (onMessagesChanges)="bulkChanges($event)"></app-mail-bulk-actions>
+      </div>
+    </split-area>
+    <split-area [size]="splitAreaSize.knowledgePanel" [minSizePixel]="300">
+      <app-mail-knowledge [message]="selectedMessage" [(contact)]="selectedContact" [topic]="selectedTopic?.name"></app-mail-knowledge>
+    </split-area>
+  </split>
+</main>

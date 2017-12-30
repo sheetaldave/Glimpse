@@ -1,0 +1,48 @@
+<nav class="navbar navbar-default" *ngIf="isAuthenticated()">
+  <div class="header-container">
+    <div class="logo">
+      <i class="icon icon-hamburger-menu" (click)="emit()"></i>
+      <a class="navbar-brand" [routerLink]="['/']"><img src="assets/logo-large.svg"/></a>
+    </div>
+    <ul class="mail-topics-nav">
+      <li><a [routerLink]="['/mail']" routerLinkActive="active">Mails</a></li>
+      <li><a [routerLink]="['/insights']" routerLinkActive="active">Insights</a></li>
+    </ul>
+    <app-search *ngIf="search" class="navbar-form"></app-search>
+    <ul class="nav">
+      <li class="dropdown user user-menu" *ngIf="account" dropdown>
+        <a dropdownToggle (click)="false">
+          <app-user-avatar class="user-img" [contact]="account"></app-user-avatar>
+          <div class="wrapper">
+						<span class="account-name">{{ account.name }} <i *ngIf="account.status === 'invalid'"
+                                                             class="fa fa-exclamation-triangle"></i></span>
+            <p class="account-email"> {{account.email}} </p>
+          </div>
+          <i class="fa fa-angle-down fa-2x"></i>
+        </a>
+        <ul class="dropdown-menu" *dropdownMenu>
+          <!-- User image -->
+          <li class="user-header">
+            <app-user-avatar [contact]="account"></app-user-avatar>
+            <p>
+              {{ account.name }}<br/>
+            </p>
+          </li>
+          <!-- Menu Body -->
+          <li class="user-body" [routerLink]="['/account']">
+            <i *ngIf="account.status === 'invalid'" class="fa fa-exclamation-triangle"></i> {{ account.email }}
+          </li>
+          <!-- Menu Footer-->
+          <li class="user-footer">
+            <div class="pull-left">
+              <button class="btn btn-default btn-flat" [routerLink]="['/account']">Settings</button>
+            </div>
+            <div class="pull-right">
+              <button class="btn btn-default btn-flat" (click)="signOut()">Sign out</button>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>

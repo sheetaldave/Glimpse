@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/app",
+    "module": "es2015",
+    "baseUrl": "",
+    "types": [
+      "gapi",
+      "gapi.auth2",
+      "google.analytics",
+      "tinymce"
+    ]
+  },
+  "exclude": [
+    "test.ts",
+    "**/*.spec.ts"
+  ]
+}

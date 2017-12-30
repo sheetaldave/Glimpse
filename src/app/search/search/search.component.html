@@ -1,0 +1,47 @@
+<form (submit)="performSearch('keyword')">
+  <div class="input-group" dropdown
+       [isOpen]="status.isopen && searchHistory"
+       (isOpenChange)="change($event)"
+       [ngClass]="{'activeSearch': searchActive}">
+    <input
+      type="text"
+      name="q"
+      class="form-control"
+      autocomplete="off"
+      placeholder="Search..."
+      [(ngModel)]="query"
+      (focus)="showSuggestions($event)"
+      (blur)="hide($event)"
+      (keyup)="showSuggestions($event)"
+      #focusable>
+    <span class="input-group-btn" (click)="toggleSearch(false)">
+      <span id="search-btn" class="btn btn-flat"><i class="fa fa-remove"></i></span>
+    </span>
+    <ul *dropdownMenu class="dropdown-menu col-xs-12" role="menu">
+      <li role="menuitem" *ngIf="query">
+        <a class="dropdown-item" (click)="chooseAndSearch(query, 'keyword')">
+          <div class="search-suggestions-icon"><i class="fa fa-search"></i></div> {{ query }} <span class="label label-default">Keyword</span>
+        </a>
+      </li>
+      <li role="menuitem" *ngFor="let search of searchHistory?.history">
+        <a class="dropdown-item" (click)="chooseAndSearch(search.query, 'keyword')">
+          <div class="search-suggestions-icon"><i class="fa fa-search"></i></div> {{ search.query }} <span class="label label-default">Keyword</span>
+        </a>
+      </li>
+      <li role="menuitem" *ngFor="let contact of searchHistory?.contacts">
+        <a class="dropdown-item" (click)="chooseAndSearch(contact.email, 'contact')">
+          <app-user-avatar [contact]="contact"></app-user-avatar>
+          <span *ngIf="contact.name">{{ contact.name }} &lt;{{ contact.email }}&gt;</span>
+          <span *ngIf="!contact.name">{{ contact.email }}</span>
+          <span class="label label-default">Contact</span>
+        </a>
+      </li>
+      <li role="menuitem" *ngFor="let topic of searchHistory?.topics">
+        <a class="dropdown-item" (click)="chooseAndSearch(topic.name, 'topic')">
+          <div class="search-suggestions-icon"><i class="fa fa-connectdevelop"></i></div> {{ topic.name }} <span class="label label-default">Topic</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</form>
+<i class="fa fa-search icon-search" (click)="toggleSearch(true, focusable)" [ngClass]="{'activeSearch': searchActive}"></i>

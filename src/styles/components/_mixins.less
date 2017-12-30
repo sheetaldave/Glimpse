@@ -1,0 +1,100 @@
+.clearfix {
+  zoom: 1; // For IE 6/7 (trigger hasLayout)
+
+  &:before, &:after {
+    content: "";
+    display: table;
+  }
+
+  &:after {
+    clear: both;
+  }
+}
+
+.border-radius (@radius: 5px) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  border-radius: @radius;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  -moz-background-clip: padding;
+}
+
+//Different radius each side
+.border-radius(@top-left,  @top-right,  @bottom-left,  @bottom-right)
+{
+  border-top-left-radius: @top-left;
+  border-top-right-radius: @top-right;
+  border-bottom-right-radius: @bottom-right;
+  border-bottom-left-radius: @bottom-left;
+}
+
+.border-top-radius(@radius: 5px) {
+  border-top-left-radius: @radius;
+  border-top-right-radius: @radius;
+}
+
+
+.padding(@left: 15px, @right: 15px, @top: 15px, @bottom: 15px) {
+  padding-left: @left;
+  padding-right: @right;
+  padding-top: @top;
+  padding-bottom: @bottom;
+}
+
+.margin(@left: 15px, @right: 15px, @top: 15px, @bottom: 15px){
+  margin-left: @left;
+  margin-right: @right;
+  margin-top: @top;
+  margin-bottom: @bottom;
+}
+.transition(@transition) {
+  -webkit-transition: @transition;
+  -o-transition: @transition;
+  transition: @transition;
+}
+
+.box-shadow(@shadow) {
+  -webkit-box-shadow: @shadow; // iOS <4.3 & Android <4.1
+  box-shadow: @shadow;
+}
+
+.bold-font() {
+  font-family: OpenSans-Bold;
+}
+
+.semibold-font() {
+  font-family: OpenSans-Semibold;
+}
+
+.regular-font() {
+  font-family: OpenSans-Regular;
+}
+
+.light-font() {
+  font-family: OpenSans-Light;
+}
+
+.lightitalic-font() {
+  font-family: OpenSans-LightItalic;
+}
+
+.italic-font() {
+  font-family: OpenSans-Italic;
+}
+
+.icon {
+  background-repeat: no-repeat !important;
+}
+
+.icon-hamburger-menu {
+  background: @icon-hamburger-menu;
+  width: 21px;
+  height: 13px;
+}
+
+.icon-replay {
+  background: @icon-replay;
+  width: 15px;
+  height: 10px;
+}

@@ -1,0 +1,35 @@
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">Overview of your account</h3>
+  </div>
+  <div class="box-body with-padding">
+    <dl class="dl-horizontal">
+      <dt>Full Name:</dt>
+      <dd>{{ account?.name }}</dd>
+      <dt>Email:</dt>
+      <dd>{{ account?.email }}</dd>
+      <dt>Email Provider:</dt>
+      <dd>{{ account?.provider }}</dd>
+      <dt>Synchronization status:</dt>
+      <dd>
+        <span class="label label-success" [ngClass]="{
+            'label-success': account?.status === 'running',
+            'label-warning': account?.status === 'stopped',
+            'label-danger': account?.status === 'invalid'}">
+          {{ account?.status }}
+        </span>
+      </dd>
+      <dd *ngIf="account?.status === 'stopped'">
+        <small><i>Synchronization for you account stopped, please contact customer support.</i></small>
+      </dd>
+      <dd *ngIf="account?.status === 'invalid'">
+        <small><i>Access token for you account expired. Press button to fix the issue.</i></small>
+      </dd>
+      <dd>
+        <button *ngIf="account?.status === 'invalid'" (click)="googleSignIn($event)" class="btn btn-default" [disabled]="loading">Grant Access</button>
+      </dd>
+    </dl>
+    <div class="alert alert-danger" *ngIf="errorMessage">{{errorMessage}}</div>
+    <div class="loader" *ngIf="loading"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+  </div>
+</div>

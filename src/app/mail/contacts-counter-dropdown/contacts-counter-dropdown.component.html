@@ -1,0 +1,45 @@
+<ul class="contacts-counter list-inline">
+  <li *ngFor="let contact of visibleContacts"
+      [ngClass]="{'selected-connection':
+      contact.name === selectedContact?.name && contact.email === selectedContact?.email,
+      'list-inline__item': true}"
+      (click)="selectContact(contact)">
+    <app-user-avatar
+      [contact]="contact"
+      [showPopover]="true"
+      [contextMenu]="true">
+    </app-user-avatar>
+  </li>
+
+  <!-- Element with dropdown and counter -->
+  <li *ngIf="contactList?.length > minContactLen"
+      [popover]="hiddenContacts"
+      [outsideClick]="true"
+      #pop="bs-popover"
+      placement="bottom">
+    <div class="load-more-contacts user-image">
+      {{hiddenContactsState.length}} +
+    </div>
+  </li>
+  <!-- end Element with dropdown and counter -->
+</ul>
+
+<!-- Dropdown content -->
+<ng-template #hiddenContacts>
+  <ul class="contact_list">
+    <li *ngFor="let contact of hiddenContactsState"
+        (click)="selectCollapsedContact(contact)"
+        class="contact_list__item">
+      <app-user-avatar
+        [contact]="contact"
+        [showPopover]="false"
+        [contextMenu]="true">
+      </app-user-avatar>
+      <div class="contact_list__info">
+        <div [hidden]="contact.name.length < 1" class="contact_name">{{contact.name}}</div>
+        <div class="contact_email">{{contact.email}}</div>
+      </div>
+    </li>
+  </ul>
+</ng-template>
+<!-- end Dropdown content -->

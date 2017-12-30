@@ -1,0 +1,38 @@
+<div class="modal-header">
+  <div class="modal-title pull-left">{{file?.name}}</div>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="modal-attachment" *ngIf="file">
+    <div *ngIf="contentType === 'image'" class="modal-img">
+      <img src={{file.url}}>
+    </div>
+    <div *ngIf="contentType === 'video'" class="modal-video">
+      <video class="video" controls src="{{file.url}}"
+              preload="metadata">
+        <source data-src="{{file.url}}" type="video/mp4"/>
+      </video>
+    </div>
+    <div *ngIf="contentType === 'pdf'">
+      <pdf-viewer [src]="{url : file.url, withCredentials: true}"
+                  [page]="1"
+                  [original-size]="true"
+                  style="display: block;"></pdf-viewer>
+    </div>
+    <div *ngIf="!contentType">
+      <div class="no-preview">
+        <div class="no-preview-text">
+          <p>No preview available</p>
+          <small>Please download an attachment</small>
+        </div>
+        <div class="download-btn">
+          <a href="{{file.url}}" download="{{file.url}}">{{file.name}}
+            <i class="fa fa-download"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,78 @@
+<split direction="vertical" [gutterSize]="2">
+  <split-area [size]="40">
+
+    <div class="topics-map" [ngClass]="{'col-xs-7': selectedTopic ? true : false}">
+      <div class="topic-map-wrap">
+        <div class="btn-group time-dd" dropdown  *ngIf="filters">
+          <a dropdownToggle type="button" class="dropdown-toggle">
+            {{ selectedFilter.title }} <i class="fa fa-caret-down"></i>
+          </a>
+          <ul *dropdownMenu class="dropdown-menu dropdown-menu-right"  role="menu">
+            <li *ngFor="let filter of filters" role="menuitem"><a class="dropdown-item" (click)="selectFilter(filter)">{{ filter.title }}</a></li>
+          </ul>
+        </div>
+        <div *ngFor="let topic of topics; let i = index;"
+             class="topic-map-circle"
+             [ngClass]="'order-'+ (i + 1)"
+             [class.selected]="topic.name == currentTopic?.name"
+             [contextMenu]="topicMapMenu"
+             [contextMenuSubject]="topic">
+          <a (click)="selectTopic(topic)"
+             [tooltip]="topic.name"
+             container="body">
+            <p>{{ topic.name }}</p>
+          </a>
+        </div>
+        <context-menu #topicMapMenu>
+          <ng-template contextMenuItem (execute)="showRelatedEmails($event.item.name)">
+            Related Emails
+          </ng-template>
+          <ng-template contextMenuItem (execute)="showRelatedAttachments($event.item.name)">
+            Related Attachments
+          </ng-template>
+        </context-menu>
+      </div>
+
+      <div *ngIf="topics?.length < 1" class="no-results"> No Topics Found </div>
+    </div>
+    <div [ngClass]="{'hidden-similar': currentTopic ? false : true ,  'col-xs-5 similar-topics-wrap user-topics': currentTopic ? true : false}"
+         class="">
+      <div *ngIf="selectedTopic">
+        <div class="text-right">
+          <i class="fa fa-close"
+          (click)="selectedTopic = null"></i>
+        </div>
+        <div class="similar-topic-title">
+          <h4>{{ currentTopic.name }}</h4>
+        </div>
+        <div class="similar-topic-breadcrumbs">
+          {{currentTopic.name }} {{ selectedSimilarTopic ? ' > ' + selectedSimilarTopic.name : ''}}
+        </div>
+
+        <h4>Similar Topics</h4>
+        <ul class="similar-topics-list list-inline">
+          <li class="similar-topics-list-item"
+              *ngFor="let topic of similarTopics"
+              [class.similarSelected]="topic.name === selectedSimilarTopic?.name">
+            <a (click)="selectSimilarTopic(topic)">{{ topic.name }}</a>
+          </li>
+        </ul>
+
+        <h4>We have found</h4>
+        <div class="folders" *ngIf="folders">
+          <div [class]="folder.name  == null ? 'hidden' : folder.name + ' folder' "
+               *ngFor="let folder of folders"
+               [class.selected-folder]="selectedFolder === folder.name"
+               (click)="selectFolder(folder.name)">
+            <i class="fa fa-inbox"></i>
+            {{ folder.name }}
+            <span class="total-connnections">{{ folder.count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </split-area>
+  <split-area [size]="60" class="split-topic-sidebar-mails-contacts">
+    <app-topic-sidebar-mails-contacts [(query)]="query" [(selectedTopic)]="selectedTopic"></app-topic-sidebar-mails-contacts>
+  </split-area>
+</split>

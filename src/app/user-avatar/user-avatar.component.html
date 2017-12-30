@@ -1,0 +1,33 @@
+<!-- Avatar -->
+<div  class="user-image"
+      [style.background-color]="color"
+      container="body"
+      [popover]="userPopover"
+      [triggers]="popoverTriggers"
+      [contextMenu]="userContextMenu"
+      [contextMenuSubject]="contact">
+      <p class="text-no-select">{{ avatar }}</p>
+</div>
+<!-- Popover -->
+<ng-template #userPopover>
+  <div><b>{{contact?.name}}</b></div>
+  <div>{{contact?.email}}</div>
+</ng-template>
+<!-- Context menu -->
+<context-menu #userContextMenu [disabled]="!contextMenu">
+  <ng-template contextMenuItem (execute)="copyEmail()">
+    Copy Email Address
+  </ng-template>
+  <ng-template contextMenuItem (execute)="sendNewEmail()">
+    Send New Email
+  </ng-template>
+  <ng-template contextMenuItem (execute)="openRelatedEmails()">
+    All Emails for Connection
+  </ng-template>
+  <ng-template contextMenuItem (execute)="openRelatedTopics()">
+    Go to Insights
+  </ng-template>
+  <ng-template [visible]="onLoadInKnowledgePanel.observers.length > 0" contextMenuItem (execute)="loadInKnowledgePanel()">
+    Load in Knowledge Pane
+  </ng-template>
+</context-menu>

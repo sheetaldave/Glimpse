@@ -1,0 +1,9 @@
+<section class="sidebar">
+  <ul class="nav nav-pills nav-stacked">
+    <li *ngFor="let section of sections">
+      <a [routerLink]="['/account', section.route]" routerLinkActive="active">
+        <i class="fa fa-{{section.icon}}"></i>&nbsp;{{section.name}}
+      </a>
+    </li>
+  </ul>
+</section>

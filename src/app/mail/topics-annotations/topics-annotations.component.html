@@ -1,0 +1,56 @@
+<div class="modal-header">
+  <h4 class="modal-title text-center">
+    Topics annotations
+  </h4>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body" *ngIf="status === 'loadingAnnotations'">
+  <div class="loader" *ngIf="status === 'saving'"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+</div>
+<div class="modal-body modal-body-topic-annotation" *ngIf="status !== 'loadingAnnotations'">
+  <table class="table table-striped">
+    <caption>Please rate the topics</caption>
+    <thead>
+      <tr>
+        <th>Topic Name</th>
+        <th>Rating</th>
+      </tr>
+    </thead>
+    <tbody *ngIf="message?.topics">
+      <tr *ngFor="let annotation of annotations">
+        <td>{{annotation.name}}</td>
+        <td>
+          <div class="btn-group">
+            <label class="btn btn-default btn-sm" [(ngModel)]="annotation.rating" btnRadio="worst">WORST</label>
+            <label class="btn btn-default btn-sm" [(ngModel)]="annotation.rating" btnRadio="average">AVERAGE</label>
+            <label class="btn btn-default btn-sm" [(ngModel)]="annotation.rating" btnRadio="good">GOOD</label>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    <tbody *ngIf="!annotations?.length">
+      <tr>
+        <td colspan="2">No Topics</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="form-group">
+    <label>Add Topic</label>
+    <input type="text" class="form-control" placeholder="Topic" (keyup.enter)="addTopic()" [(ngModel)]="newTopic" />
+  </div>
+  <div class="topic-item" *ngFor="let topic of newTopics">{{topic}} <i class="fa fa-times" (click)="removeTopic(topic)"></i></div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" [(ngModel)]="shareText"> Share this email for evaluation in plain text
+    </label>
+  </div>
+  <div class="loader" *ngIf="status === 'saving'"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+  <div class="alert alert-success" *ngIf="status === 'saved'">Annotations are saved</div>
+  <div class="alert alert-danger" *ngIf="status === 'error'">Error occured while saving: {{statusError}}</div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-default btn-sm pull-left" (click)="close()">Close</button>
+  <button class="btn btn-primary btn-sm pull-right" (click)="save()">Save</button>
+</div>

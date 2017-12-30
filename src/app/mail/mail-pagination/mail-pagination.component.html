@@ -1,0 +1,13 @@
+<div class="mail-pagenum">
+  <div class="num-total">
+    <span>{{ getMin() }} - {{ getMax() }} of {{ count }}</span>
+  </div>
+  <div class="page-next-prev">
+    <div class="page-prev" (click)="onPrevious()" [ngClass]="{'disable':page === 1 || loading }">
+      <i class="fa fa-arrow-circle-o-left"></i>
+    </div>
+    <div class="page-next" (click)="onNext()" [ngClass]="{'disable':lastPage() || loading }">
+      <i class="fa fa-arrow-circle-o-right"></i>
+    </div>
+  </div>
+</div>

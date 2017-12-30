@@ -1,0 +1,78 @@
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">Mail rules</h3>
+  </div>
+
+  <div>
+    <button type="button" class="btn btn-success m-sm" (click)="openForm()">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+      Add new mail rule
+    </button>
+  </div>
+
+  <div class="box-body with-padding" [class]="!showForm ? 'hidden' : '' ">
+    <div class="input-group">
+      <span class="input-group-addon" id="mail-rule-title">Title</span>
+      <input [(ngModel)]="inputObject.title" type="text" class="form-control" placeholder="Enter title text" aria-describedby="reply-title">
+    </div>
+
+    <div class="input-group">
+      <span class="input-group-addon" id="mail-rule-condition-name">Condition name</span>
+      <select [(ngModel)]="inputObject.conditionName" class="form-control">
+        <option value="from">From</option>
+        <option value="to">To</option>
+        <option value="cc">Cc</option>
+        <option value="subject">Subject</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <span class="input-group-addon" id="mail-rule-condition-rule">Condition rule</span>
+      <select [(ngModel)]="inputObject.conditionRule" class="form-control">
+        <option value="contains">Contains</option>
+        <option value="doesNotContain">Does not contain</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <span class="input-group-addon" id="mail-rule-condition-value">Condition value</span>
+      <input [(ngModel)]="inputObject.conditionValue" type="text" class="form-control" placeholder="Enter condition value" aria-describedby="reply-title">
+    </div>
+
+    <div class="input-group">
+      <span class="input-group-addon" id="mail-rule-action-name">Action name</span>
+      <select [(ngModel)]="inputObject.actionName" class="form-control">
+        <option value="messageForward">Forward message</option>
+        <option value="messageMarkAsRead">Mark as read message</option>
+      </select>
+    </div>
+
+    <div class="input-group" *ngIf="inputObject.actionName === 'messageForward'">
+      <span class="input-group-addon" id="mail-rule-action-value">Condition value</span>
+      <input [(ngModel)]="inputObject.actionValue" type="text" class="form-control" placeholder="Enter action value" aria-describedby="reply-title">
+    </div>
+
+    <button class="btn btn-primary m-sm" (click)="saveRule()">Save</button>
+    <button type="button" class="btn btn-secondary m-sm" (click)="closeForm()">Cancel</button>
+    <div class="alert alert-success" *ngIf="saved">Mail rule is saved</div>
+    <div class="alert alert-danger" *ngIf="errorMessage">{{errorMessage}}</div>
+    <div class="loader" *ngIf="loading"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+  </div>
+
+
+  <div class="list-group" *ngIf="mailRules && mailRules.length">
+    <div class="list-group-item" *ngFor="let mailRule of mailRules">
+      {{mailRule.title}}
+        <div>
+          <div><strong>Condition name:</strong> {{mailRule.conditionName}}</div>
+          <div><strong>Condition rule:</strong> {{mailRule.conditionRule}}</div>
+          <div><strong>Condition value:</strong> {{mailRule.conditionValue}}</div>
+          <div><strong>Action name:</strong> {{mailRule.actionName}}</div>
+          <div><strong>Action value:</strong> {{mailRule.actionValue}}</div>
+        </div>
+        <button (click)="openForm(mailRule)" type="button" class="btn btn-success p-xxs">Edit</button>
+        <button (click)="deleteRule(mailRule.id)"type="button" class="btn btn-danger p-xxs">Delete</button>
+    </div>
+  </div>
+
+</div>

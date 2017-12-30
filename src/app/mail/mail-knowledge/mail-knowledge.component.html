@@ -1,0 +1,245 @@
+<div class="mail-knowledge content" *ngIf="message || (selectedContact && contactOnly)">
+  <ul class="nav-buttons" *ngIf="message">
+    <li>
+      <button type="button"
+              class="btn btn-link"
+              [ngClass]="{active: selectedTab === 'message'}"
+              (click)="selectTab('message')"><i class="fa fa-connectdevelop"></i></button>
+    </li>
+    <li>
+      <button type="button"
+              class="btn btn-link"
+              [ngClass]="{active: selectedTab === 'contacts'}"
+              (click)="selectTab('contacts')"><i class="fa fa-users"></i></button>
+    </li>
+  </ul>
+  <span *ngIf="selectedTab === 'message' || selectedTab === 'contacts'">
+    <div class="header-topic-box" *ngIf="selectedTab === 'message'">
+      <div class="knowledge-box">
+        <div class="discovered-topic">{{topic}}</div>
+        <div class="no-discovered-topic" *ngIf="!topic">Discovered Topics (Email)</div>
+        <div class="related-topic">{{selectedTopic}}</div>
+      </div>
+    </div>
+    <div class="header-contact-box" *ngIf="selectedTab === 'contacts'">
+      <div class="knowledge-box">
+        <div class="contact-title">Contact Knowledge Pane</div>
+        <div class="contact-buttons">
+          <div class="btn-group" *ngIf="message">
+            <button type="button"
+                    class="btn btn-default btn-xs"
+                    [ngClass]="{active: mode === 'context'}"
+                    (click)="switchMode('context')">Related
+            </button>
+            <button type="button"
+                    class="btn btn-default btn-xs"
+                    [ngClass]="{active: mode === 'all'}"
+                    (click)="switchMode('all')">All Data
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="user-block" *ngIf="selectedContact">
+      <div class="knowledge-box">
+        <div class="dropdown-button" dropdown *ngIf="message && dropdownParticipants?.length > 0">
+          <button dropdownToggle type="button" class="btn btn-link dropdown-toggle"><i class="fa fa-chevron-down"></i></button>
+          <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+            <li role="menuitem" *ngFor="let contact of dropdownParticipants"><a class="dropdown-item text-no-select" (click)="selectSenderContact(contact)">{{ contact.email }}</a></li>
+          </ul>
+        </div>
+        <div class="user-info">
+          <div class="user-profile pull-left">
+            <app-user-avatar [contact]="selectedContact" [contextMenu]="true"></app-user-avatar>
+          </div>
+          <div class="user-description">
+            <p class="user-name">{{selectedContact.name}}</p>
+            <p [ngClass]="{'user-email': selectedContact.name, 'user-name': !selectedContact.name}">{{selectedContact.email}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="loaders.global" class="loader"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+    <split *ngIf="!loaders.global" direction="vertical" (dragEnd)="onDragEnd($event)" [gutterSize]="5" class="knowledge-split" [class.knowledge-split-with-contact]="selectedContact !== null">
+      <split-area [sizePixel]="splitAreaSize.topics ? null : 120"
+                  [size]="splitAreaSize.topics"
+                  [minSizePixel]="33"
+                  infiniteScroll
+                  [infiniteScrollDistance]="2"
+                  [infiniteScrollThrottle]="10"
+                  [immediateCheck]="true"
+                  [scrollWindow]="false"
+                  [infiniteScrollDisabled]="!(relatedInfo?.topics.count > relatedInfo?.topics.data.length && !loaders.topics)"
+                  (scrolled)="loadRelatedTopics()">
+        <div class="knowledge-box">
+          <h5>
+            <span *ngIf="!selectedContact">Related Topics (Email)</span>
+            <span *ngIf="selectedContact && mode === 'context'">Related Topics (Email)</span>
+            <span *ngIf="selectedContact && mode === 'all'">All Topics (Contact)</span>
+          </h5>
+          <div>
+            <div class="topic-item"
+                [ngClass]="{selected: topic === selectedTopic}"
+                *ngFor="let topic of relatedInfo?.topics.data"
+                (click)="selectTopic(topic)"
+                [contextMenu]="topicMenu"
+                [contextMenuSubject]="topic">
+              {{ topic }} <i class="fa fa-times" *ngIf="topic === selectedTopic"></i>
+            </div>
+            <div class="loader" *ngIf="loaders.topics"><i class="fa fa-refresh fa-spin fa-fw"></i></div>
+            <div *ngIf="!relatedInfo?.topics.data.length && !loaders.topics" class="placeholder">No related topics</div>
+            <context-menu #topicMenu>
+              <ng-template contextMenuItem (execute)="showRelatedEmails($event.item)">
+                Related Emails
+              </ng-template>
+              <ng-template contextMenuItem (execute)="showRelatedTopics($event.item)">
+                Go to Insights Screen
+              </ng-template>
+            </context-menu>
+          </div>
+        </div>
+      </split-area>
+      <split-area [sizePixel]="splitAreaSize.contacts ? null : 165"
+                  [size]="splitAreaSize.contacts"
+                  [minSizePixel]="33"
+                  infiniteScroll
+                  [infiniteScrollDistance]="2"
+                  [infiniteScrollThrottle]="10"
+                  [immediateCheck]="true"
+                  [scrollWindow]="false"
+                  (scrolled)="loadRelatedConnections()">
+        <div>
+          <h5 class="title">
+            <span *ngIf="!selectedContact">Related Connections (Topics)</span>
+            <span *ngIf="selectedContact && mode === 'context'">Related Connections (Topics)</span>
+            <span *ngIf="selectedContact && mode === 'all'">All Connections (Contact)</span>
+          </h5>
+          <div class="user-connections">
+            <ul class="list-inline">
+              <li *ngFor="let connection of relatedInfo?.connections.data"
+                  (click)="selectConnection(connection)"
+                  [ngClass]="{'selected-user-connection': connection === selectedConnection}">
+                <app-user-avatar [contact]="connection"
+                                 [showPopover]="false"
+                                 [contextMenu]="true"
+                                 (onLoadInKnowledgePanel)="selectContact(connection)">
+                </app-user-avatar>
+                <div class="user-description">
+                    <div class="user-name">{{connection.name}}</div>
+                    <div [ngClass]="{'user-email': connection.name, 'user-name': !connection.name}">{{connection.email}}</div>
+                </div>
+              </li>
+            </ul>
+            <div class="loader" *ngIf="loaders.connections">
+                <i class="fa fa-refresh fa-spin fa-2x fa-fw"></i>
+            </div>
+            <div *ngIf="!relatedInfo?.connections.data.length && !loaders.connections" class="placeholder">No related connections</div>
+          </div>
+        </div>
+      </split-area>
+      <split-area [autoSize]="true">
+          <div class="knowledge-box">
+            <tabset>
+              <tab heading="Mails">
+                <div class="btn-group time-dd" dropdown *ngIf="relatedInfo?.messages.data.length">
+                  <a href="javascript:void(0)" dropdownToggle type="button" class="dropdown-toggle">
+                 Order by: {{ selectedOrder }} <i class="fa fa-caret-down"></i>
+                  </a>
+                  <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+                  <li *ngFor="let order of orders" role="menuitem"><a class="dropdown-item"
+                                                                      (click)="selectOrder(order)">{{ order }}</a></li>
+                </ul>
+               </div>
+                <div class="pane">
+                  <div class="user-info-scrollable">
+                    <div *ngFor="let message of relatedInfo?.messages.data" class="box box-solid box-header box-message" (click)="openMessage(message)">
+                      <i class="fa" [ngClass]="{'fa-envelope-open': !message.unread, 'fa-envelope': message.unread}"></i><span *ngIf="message.files.length>0"> <i class="fa fa-paperclip"></i></span>
+                      {{message.from?.name || message.from?.email || 'Unknown'}}: {{message.subject}}
+                      <span class="no-subject" *ngIf="!message.subject">No subject</span>
+                      <p class="date-time">{{message.sentTime | mailDate }}</p>
+                    </div>
+                    <div *ngIf="!relatedInfo?.messages.data.length && !loaders.messages" class="placeholder">No related messages</div>
+                    <a class="load-more" (click)="loadRelatedMessages()" *ngIf="relatedInfo?.messages.count > relatedInfo?.messages.data.length && !loaders.messages">Load more</a>
+                    <div class="loader" *ngIf="loaders.messages"><i class="fa fa-refresh fa-spin fa-fw"></i></div>
+                  </div>
+                </div>
+              </tab>
+              <tab heading="Files">
+                <select class="form-control" [(ngModel)]="filesType">
+                  <option value="allTypes">All Files</option>
+                  <option value="image">Images</option>
+                  <option value="video">Videos</option>
+                  <option value="document">Documents</option>
+                </select>
+                <div class="pane">
+                  <div class="user-info-scrollable">
+                    <ul class="list-group" *ngIf="filesType === 'allTypes'">
+                      <li *ngFor="let file of relatedInfo?.files.allTypes.data" class="box box-solid box-header box-message">
+                        <a href="{{file.url}}" target="_blank">{{file.name}}</a>
+                      </li>
+                      <li *ngIf="!relatedInfo?.files.allTypes.data.length && !loaders.allTypes" class="placeholder">No related Files</li>
+                      <li class="load-more" *ngIf="relatedInfo?.files.allTypes.count > relatedInfo?.files.allTypes.data.length && !loaders.allTypes">
+                        <a (click)="loadRelatedFiles('allTypes')">Load more</a>
+                      </li>
+                      <li *ngIf="loaders.allTypes">
+                        <i class="fa fa-refresh fa-spin fa-fw"></i>
+                      </li>
+                    </ul>
+                    <ul class="list-inline" *ngIf="filesType === 'image'">
+                      <li *ngFor="let file of relatedInfo?.files?.images.data">
+                        <a href="{{file.url}}" target="_blank">
+                          <img src="{{file.url}}" class="img-responsive user-email-image"/>
+                        </a>
+                      </li>
+                      <li *ngIf="!relatedInfo?.files.images.data.length && !loaders.images" class="placeholder">No related images</li>
+                      <li class="load-more" *ngIf="relatedInfo?.files.images.count > relatedInfo?.files.images.data.length && !loaders.images">
+                        <a (click)="loadRelatedFiles('images')">Load more</a>
+                      </li>
+                      <li *ngIf="loaders.images">
+                        <i class="fa fa-refresh fa-spin fa-fw"></i>
+                      </li>
+                    </ul>
+                    <ul class="list-group" *ngIf="filesType === 'video'">
+                      <li *ngFor="let file of relatedInfo?.files.videos.data" class="video_wrapper">
+                        <video controls src="{{file.url}}"
+                              preload="metadata" #videoPlayer>
+                          <source data-src="{{file.url}}" type="{{ file.type }}" class=""/>
+                        </video>
+                      </li>
+                      <li *ngIf="!relatedInfo?.files.videos.data.length && !loaders.videos" class="placeholder">No related videos</li>
+                      <li class="load-more" *ngIf="relatedInfo?.files.videos.count > relatedInfo?.files.videos.data.length && !loaders.documents">
+                        <a (click)="loadRelatedFiles('videos')">Load more</a>
+                      </li>
+                      <li *ngIf="loaders.videos">
+                        <i class="fa fa-refresh fa-spin fa-fw"></i>
+                      </li>
+                    </ul>
+                    <ul class="list-group" *ngIf="filesType === 'document'">
+                      <li *ngFor="let file of relatedInfo?.files.documents.data" class="box box-solid box-header box-message">
+                        <i class="fa fa-2x fa-file-text" aria-hidden="true"> </i>
+                        <a href="{{file.url}}" target="_blank">{{file.name}}</a>
+                      </li>
+                      <li *ngIf="!relatedInfo?.files.documents.data.length && !loaders.documents" class="placeholder">No related documents</li>
+                      <li class="load-more" *ngIf="relatedInfo?.files.documents.count > relatedInfo?.files.documents.data.length && !loaders.documents">
+                        <a (click)="loadRelatedFiles('documents')">Load more</a>
+                      </li>
+                      <li *ngIf="loaders.documents">
+                        <i class="fa fa-refresh fa-spin fa-fw"></i>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </tab>
+            </tabset>
+          </div>
+      </split-area>
+    </split>
+  </span>
+</div>
+<div  class="mail-knowledge content" *ngIf="!message && !(selectedContact && contactOnly)">
+  <div class="box box-solid">
+    <div class="box-body">
+      <span class="no-data-warning">No Mail selected</span>
+    </div>
+  </div>
+</div>

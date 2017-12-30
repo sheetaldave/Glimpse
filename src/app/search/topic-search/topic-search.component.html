@@ -1,0 +1,21 @@
+<form  (submit)="performSearch('topics')" class="topic-search">
+  <div class="input-group"   dropdown [isOpen]="status.isopen" (isOpenChange)="change($event)">
+    <span class="icon-block" (click)="performSearch('topics')"><i class="fa fa-search"></i></span>
+    <input
+            type="text"
+            name="q"
+            class="form-control"
+            autocomplete="off"
+            placeholder="Search"
+            [(ngModel)]="query"
+            (focus)="showSuggestions($event)"
+            (blur)="hide($event)"
+            (keyup)="showSuggestions($event)">
+    <ul *dropdownMenu class="dropdown-menu col-xs-12" role="menu">
+      <li role="menuitem" class="dropdown-header" *ngIf="searchHistory?.topics.length < 1"> ... no suggestions</li>
+      <li role="menuitem" *ngFor="let topic of searchHistory?.topics">
+        <a class="dropdown-item" (click)="chooseAndSearch(topic.name, 'topic')">{{ topic.name }} <span class="label label-default">Topic</span></a>
+      </li>
+    </ul>
+  </div>
+</form>

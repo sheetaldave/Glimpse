@@ -1,0 +1,54 @@
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">Signatures</h3>
+  </div>
+
+  <div>
+    <button type="button" class="btn btn-success m-sm" (click)="openForm()">
+      <i class="fa fa-plus" aria-hidden="true"></i>
+      Add new signature
+    </button>
+  </div>
+
+  <div class="box-body with-padding" [class.hidden]="!showForm">
+    <div class="form-group">
+      <label for="sginature-title">Title: </label>
+      <input id="sginature-title" [(ngModel)]="selectedSignature.title" type="text" class="form-control" placeholder="Enter title text" />
+    </div>
+    <div class="input-group">
+      <label>Content: </label>
+    </div>
+    <p><textarea id="{{elementId}}"></textarea></p>
+    <button class="btn btn-primary m-sm" (click)="saveSignature()">Save</button>
+    <button type="button" class="btn btn-secondary m-sm" (click)="closeForm()">Cancel</button>
+  </div>
+
+  <div [ngSwitch]="state">
+    <div class="loader" *ngSwitchCase="'processing'"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+    <div class="alert alert-success" *ngSwitchCase="'saved'">Signature is saved</div>
+    <div class="alert alert-success" *ngSwitchCase="'deleted'">Signature has been deleted</div>
+    <div class="alert alert-success" *ngSwitchCase="'defaultSet'">Signature set as default</div>
+    <div class="alert alert-danger" *ngSwitchCase="'error'">{{errorMessage}}</div>
+  </div>
+
+  <div class="loader" *ngIf="loadingSignatures"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+
+  <div class="list-group" *ngIf="signatures">
+    <span class="list-group-item" *ngFor="let signature of signatures">
+      <h4 class="list-group-item-heading">
+        {{ signature.title }}
+        <button (click)="openForm(signature)" type="button" class="btn btn-success p-xxs">Edit</button>
+        <button (click)="removeSignature(signature)"type="button" class="btn btn-danger p-xxs">Delete</button>
+        <button
+            (click)="setDefault(signature)"
+            [disabled]="signature.isDefault"
+            type="button"
+            class="btn btn-default p-xxs">
+          {{ signature.isDefault ? 'Default' : 'Set as Default' }}
+        </button>
+      </h4>
+      <p class="list-group-item-text" [innerHTML]="signature.content"></p>
+    </span>
+  </div>
+
+</div>

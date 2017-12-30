@@ -1,0 +1,26 @@
+<div class="box">
+  <div class="box-header with-border">
+    <h3 class="box-title">Configure your auto reply option</h3>
+  </div>
+
+  <div class="box-body with-padding">
+    <div class="alert alert-success" *ngIf="success && errorMessage.length < 1">Autoreply template is saved</div>
+    <div class="alert alert-danger" *ngIf="errorMessage">{{errorMessage}}</div>
+    <div class="loader" *ngIf="loading"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>
+
+    <div class="autoreply-container">
+      <div class="date-time-pick">
+        <p>From:</p>
+        <ngx-datetime-picker [(selectedDateTime)]="fromDateTime"></ngx-datetime-picker>
+      </div>
+      <div class="date-time-pick">
+        <p>Till:</p>
+        <ngx-datetime-picker [(selectedDateTime)]="tillDateTime"></ngx-datetime-picker>
+      </div>
+    </div>
+
+    <p>Fill the message for autoreply</p>
+    <p><textarea id="{{elementId}}"></textarea></p>
+    <p><button class="btn btn-primary" (click)="saveAutoReply()">Save</button></p>
+  </div>
+</div>

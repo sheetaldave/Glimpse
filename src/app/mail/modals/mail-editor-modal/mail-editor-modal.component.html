@@ -1,0 +1,298 @@
+<div class="modal-header">
+  <h5 class="modal-title text-center">
+    {{ modalTitle }} <span *ngIf="sending || saving">({{ saving ? 'Saving to Drafts...' : 'Sending...'}})<i class="fa fa-refresh fa-spin fa-1x fa-fw"></i></span>
+  </h5>
+  <button type="button" class="close pull-right" aria-label="Close"
+          [disabled]="sending"
+          (click)="saveMessageToDrafts()">
+    <span class="close__icon" aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body mail-editor-modal">
+
+  <div class="input-wrap" dropdown>
+    <div class="recipients">
+      <div class="placeholder">
+        To:
+      </div>
+      <div class="recipients-item" *ngFor="let contact of to">
+        {{ contact?.name + ' <' + contact.email + '>;' }}
+        <i class="fa fa-close"
+            (click)="removeContact(to, contact, inputTo)"
+        ></i>
+      </div>
+      <div *ngIf="toContact?.email" class="recipients-item">
+        {{ toContact?.name + ' <' + toContact.email + '>;' }}
+        <i class="fa fa-close"
+            (click)="removeContact(to, toContact, inputTo)"
+        ></i>
+      </div>
+      <span dropdownToggle #toggleTo></span>
+      <input class="recipients-input"
+              type="email"
+              name="sendTo"
+              autocomplete="off"
+              [(ngModel)]="searchQueryTo"
+              (keyup)="search(searchQueryTo, $event, 'to', inputTo, toggleTo)"
+              (change)="allowSave()"
+              #inputTo>
+      <span class="pull-right cc">
+      <a class="show-cc-bcc" *ngIf="showCc == false"
+          (click)="showCc = true">
+        Cc <span *ngIf="showBcc == false">,</span></a>
+      <a class="show-cc-bcc" *ngIf="showBcc == false"
+          (click)="showBcc = true">
+        Bcc</a>
+    </span>
+    </div>
+
+    <ul *dropdownMenu
+        class="dropdown-menu contacts"
+        [ngClass]="{'hidden': contacts.length < 1 || searchQueryTo?.length < 2}"
+        role="menu">
+      <li role="menuitem"
+          *ngFor="let contact of contacts"
+          (click)="selectContact('to', contact, inputTo)"
+          class="dropdown-item">
+        <a>
+          <app-user-avatar [contact]="contact"></app-user-avatar>
+          {{ contact.name ? contact.name : contact.email }}
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="text-right cc">
+
+    <div class="input-wrap"
+          *ngIf="showCc"
+          dropdown>
+      <div class="recipients">
+        <div class="placeholder">
+          Cc:
+        </div>
+        <div class="recipients-item"
+              *ngFor="let contact of cc">
+          {{ contact.name + ' <' + contact.email + '>;' }}
+          <i class="fa fa-close"
+              (click)="removeContact(cc, contact, inputCc)"></i>
+        </div>
+        <span dropdownToggle #toggleCc></span>
+        <input class="recipients-input"
+                type="email"
+                name="copyTo"
+                autocomplete="off"
+                [(ngModel)]="searchQueryCc"
+                (keyup)="search(searchQueryCc, $event, 'cc', inputCc, toggleCc)"
+                (change)="allowSave()"
+                #inputCc>
+      </div>
+
+      <ul *dropdownMenu
+          class="dropdown-menu contacts"
+          [ngClass]="{'hidden': contacts.length < 1 || searchQueryCc?.length < 2}"
+          role="menu">
+        <li class="dropdown-empty"
+            role="menuitem"
+            *ngIf="contacts?.length < 1">No suggestions...
+        </li>
+        <li role="menuitem"
+            *ngFor="let contact of contacts"
+            (click)="selectContact('cc', contact, inputCc)"
+            class="dropdown-item">
+          <a>
+            <app-user-avatar [contact]="contact"></app-user-avatar>
+            {{ contact.name ? contact.name : contact.email }}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="input-wrap new-letter"
+          *ngIf="showBcc"
+          dropdown>
+      <div class="recipients">
+        <div class="placeholder">
+          Bcc:
+        </div>
+        <div class="recipients-item"
+              *ngFor="let contact of bcc">
+          {{ contact.name + ' <' + contact.email + '>;' }}
+          <i class="fa fa-close"
+              (click)="removeContact(bcc, contact,inputBcc)"
+          ></i>
+        </div>
+        <span dropdownToggle #toggleBcc></span>
+        <input class="recipients-input"
+                type="email"
+                name="hiddenTo"
+                autocomplete="off"
+                [(ngModel)]="searchQueryBcc"
+                (keyup)="search(searchQueryBcc, $event, 'bcc', inputBcc, toggleBcc)"
+                (change)="allowSave()"
+                #inputBcc>
+      </div>
+
+      <ul *dropdownMenu
+          class="dropdown-menu contacts"
+          [ngClass]="{'hidden':  contacts.length < 1  || searchQueryBcc?.length < 2}"
+          role="menu">
+        <li class="dropdown-empty"
+            role="menuitem"
+            *ngIf="contacts?.length < 1">No suggestions...
+        </li>
+        <li role="menuitem"
+            *ngFor="let contact of contacts"
+            (click)="selectContact('bcc', contact, inputBcc)"
+            class="dropdown-item">
+          <a>
+            <app-user-avatar [contact]="contact"></app-user-avatar>
+            {{ contact.name ? contact.name : contact.email }}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="input-wrap">
+    <div class="subject">
+      <div class="placeholder">Subject</div>
+      <input type="text"
+              class="input"
+              [(ngModel)]="subject"
+              name="subject"
+              (change)="allowSave()">
+    </div>
+  </div>
+  <div class="text-editor-wrap">
+    <text-editor
+      (onEditorKeyup)="editorChangesHandler($event)" [messageBody]="messageTxt">
+    </text-editor>
+  </div>
+  <div class="clearfix"></div>
+  <div class="box-footer" *ngIf="attachments?.length > 0">
+    <ul class="mailbox-attachments clearfix">
+      <li class="attachment" *ngFor="let attachment of attachments">
+          <span class="mailbox-attachment-icon">
+            <i [class]="attachmentIcon(attachment.type)"></i>
+          </span>
+        <div class="mailbox-attachment-info">
+            <span class="attachment-title">
+              <i class="fa fa-paperclip"></i> {{ attachment.name }}</span>
+          <span class="mailbox-attachment-size">
+              {{ attachment.size }} KB
+            </span>
+        </div>
+        <span class="mailbox-attachment-remove_icon">
+            <i class="fa fa-close" (click)="removeAttachedFile(attachment)"></i>
+          </span>
+      </li>
+    </ul>
+  </div>
+  <div class="box-footer error-message-container" *ngIf="errorMessage">
+    <div class="alert alert-danger">
+      <span class="error-message">{{errorMessage}}
+        <button aria-label="Close" class="close" type="button"
+                (click)="errorMessage = null"> <span
+          aria-hidden="true">×</span> </button>
+      </span>
+    </div>
+  </div>
+  <div class="input-wrap pull-down footer clearfix">
+    <div class="pull-left follow-up">
+      <i class="fa fa-calendar-plus-o fa-1-5x" (click)="showCalendar = !showCalendar" *ngIf="showCalendar == false"></i>
+      <span *ngIf="showCalendar == true">
+        <ngx-datetime-picker
+        [(selectedDateTime)]="selectedDateTime"
+        placeholder="Follow up email">
+      </ngx-datetime-picker>
+      </span>
+    </div>
+    <div class="pull-left footer-item">
+      <i class="fa fa-1-5x fa-paperclip" (click)="triggerInput(input)"></i>
+    </div>
+    <div class="show-more-options pull-left footer-item"
+          dropdown
+          [dropup]="true">
+      <i class="fa fa-ellipsis-h fa-1-5x" dropdownToggle></i>
+      <ul class="show-more-options-dropdown dropdown-menu"
+          *dropdownMenu
+      >
+
+        <li class="dropdown-item">
+          <div *ngIf="signatures?.length < 1">
+            <a (click)="close()" [routerLink]="['/account/signatures']">
+              Add Signature(s)
+            </a>
+          </div>
+          <div *ngIf="signatures && signatures?.length"
+                dropdown
+                [isOpen]="openNestedDropdown === 'signatures'"
+                (mouseenter)="openNestedDropdown = 'signatures'"
+                [dropup]="false"
+                placement="right">
+            <a dropdownToggle (click)="false">
+              Choose signature <i class="pull-right fa fa-caret-right"></i>
+            </a>
+            <ul *dropdownMenu class="dropdown-menu dropdown-menu-right nested-dropdown" role="menu">
+              <li role="menuitem"
+                  *ngFor="let signature of signatures"
+                  class="dropdown-item">
+                <a (click)="useSignature(signature)">{{signature.title}}</a>
+              </li>
+            </ul>
+          </div>
+
+        </li >
+        <li class="dropdown-item">
+          <div *ngIf="quickReplyTemplates?.length < 1">
+            <a (click)="close()" [routerLink]="['/account/quick-reply-templates']">
+              Add Quick Reply Template(s)
+            </a>
+          </div>
+          <div *ngIf="quickReplyTemplates && quickReplyTemplates?.length"
+                dropdown
+                [isOpen]="openNestedDropdown === 'replay'"
+                (mouseenter)="openNestedDropdown = 'replay'"
+                [dropup]=[false]
+                placement="right">
+            <a dropdownToggle
+                (click)="false">
+              Choose quick reply <i class="pull-right fa fa-caret-right"></i>
+            </a>
+            <ul *dropdownMenu class="dropdown-menu dropdown-menu-right nested-dropdown" role="menu">
+              <li role="menuitem"
+                  *ngFor="let replyTemplate of quickReplyTemplates"
+                  class="dropdown-item">
+                <a (click)="useQuickReplyTemplate(replyTemplate)">{{replyTemplate.title}}</a>
+              </li>
+            </ul>
+          </div>
+
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="attachmentUploading" class="loader pull-left">
+      <i class="fa fa-refresh fa-spin fa-2x"></i>
+    </div>
+    <input #input type="file" class="hidden" (change)="uploadFile($event)" multiple>
+    <div class="pull-right">
+      <button class="btn btn-default"
+        (click)="close()"><i class="fa fa-trash-o"></i>
+      </button>
+      <button class="btn btn-primary"
+              *ngIf="!cancelMessageJobId"
+              [disabled]="(sending && !cancelMessageJobId) || attachmentUploading"
+              (click)="sendMail()">
+        {{ sending ? 'Sending message...' : 'Send' }}
+      </button>
+      <button class="btn btn-primary"
+              *ngIf="cancelMessageJobId"
+              [disabled]="cancelling"
+              (click)="cancelMail()">
+        <span *ngIf="cancelling">Cancelling message...</span>
+        <span *ngIf="!cancelling">Cancel message</span>
+      </button>
+    </div>
+  </div>
+</div>

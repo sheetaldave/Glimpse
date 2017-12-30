@@ -1,0 +1,49 @@
+<section class="content mail-content">
+  <accordion (click)="expandThread()">
+    <div *ngIf="showAll">
+      <!-- Threads view for expanded state -->
+      <accordion-group *ngFor="let message of getMessages()"
+          (isOpenChange)="isOpenThread = $event"
+          (click)="scrollToTop($event)">
+        <div accordion-heading>
+          <b>{{message.from.name}}:</b> <span class="pull-right thread-date"> {{message.sentTime | mailDate}}</span>
+          <p>{{message.subject}}</p>
+
+          <div class="user-topics">
+            <ul class="thread-topics-list">
+              <li *ngFor="let topic of message?.topics" class="topic-item">
+                  {{topic.name}}
+              </li>
+            </ul>
+          </div>
+        </div>
+        <app-mail-content [selectedMessage]="message" (topicSelected)="selectTopic($event)"></app-mail-content>
+      </accordion-group>
+    </div>
+    <div *ngIf="!showAll && getMessages().length > 0">
+      <!-- Threads view for collapsed state -->
+      <accordion-group
+          (isOpenChange)="isOpenThread = $event"
+          (click)="scrollToTop($event)">
+        <div accordion-heading>
+          <b>{{getMessages()[0]?.from.name}}:</b> <span class="pull-right thread-date">{{getMessages()[0]?.sentTime | mailDate}}</span>
+          <p>{{getMessages()[0]?.subject}}</p>
+
+            <div class="user-topics">
+              <ul class="thread-topics-list">
+                <li *ngFor="let topic of getMessages()[0]?.topics" class="topic-item">
+                    {{topic.name}}
+                </li>
+              </ul>
+            </div>
+        </div>
+        <app-mail-content [selectedMessage]="getMessages()[0]" (topicSelected)="selectTopic($event)"></app-mail-content>
+      </accordion-group>
+    </div>
+    <div *ngIf="getMessages().length > 1 && !showAll"
+         (click)="showAllMessagesInThread()"
+         class="show-all-messages">
+      {{'+ ' + (getMessages().length - 1) + ' older message(s)'}}
+    </div>
+  </accordion>
+</section>

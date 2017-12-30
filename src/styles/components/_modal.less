@@ -1,0 +1,547 @@
+.modal-dialog {
+  margin: 0;
+  overflow: auto;
+  height: 100% !important;
+  width: auto !important;
+}
+
+.modal-content {
+  overflow: hidden;
+  max-height: 95vh;
+  max-width: 95vw;
+}
+
+.modal-body {
+  padding: 0 5px 10px 5px;
+  height: calc(~'100% - 54px');
+}
+
+.modal-header {
+  background-color: #313a66;
+  color: @white;
+  .close {
+    color: @white;
+    opacity: 1;
+  }
+
+  .close:focus,
+  .close__icon:focus {
+    outline: none;
+  }
+}
+
+.modal-title {
+  display: inline-flex;
+  align-items: center;
+  text-align: left;
+  color: @white;
+  cursor: move;
+  font-size: 13px;
+  .semibold-font;
+}
+
+.btn-nav-modal {
+  margin-right: 20px;
+  outline: none !important;
+  color: @white;
+  border: 1px solid @white;
+  border-radius: 4px;
+  &.active {
+    box-shadow: none;
+    color: @white;
+    background-color: @purple;
+    border-color: @purple;
+  }
+
+  &.btn:focus, &.btn:hover {
+    color: @white;
+    border-color: @white;
+  }
+  &.btn.active:focus, &.btn.active:hover {
+    color: @white;
+    border-color: @purple;
+  }
+}
+
+.modal-attachment {
+  width: 100%;
+  height: 100%;
+  min-height: 30px;
+
+  .modal-img, .modal-video {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    margin: 10px auto;
+    overflow-x: auto;
+
+    .video {
+      width: 100%;
+      height: 100%;
+      -o-object-fit: contain;
+      object-fit: contain;
+    }
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      -o-object-fit: contain;
+      object-fit: contain;
+    }
+  }
+  .no-preview {
+    background: gray;
+    color: #fff;
+    text-align: center;
+    font-size: 20px;
+    width: 60%;
+    margin: 30px auto 20px;
+    border-radius: 4px;
+    padding: 10px;
+    p {
+      margin-bottom: 0;
+    }
+    .download-btn {
+      background: @blue-light;
+      width: auto;
+      display: inline-block;
+      margin: 10px auto 0;
+      padding: 5px 10px;
+      border-radius: 4px;
+      position: relative;
+      text-overflow: ellipsis;
+      white-space: normal;
+      overflow: hidden;
+      min-width: auto;
+      max-width: 500px;
+      .fa {
+        position: absolute;
+        top: 10px;
+        left: 20px;
+      }
+      a {
+        color: @white;
+        padding: 10px 30px;
+      }
+    }
+  }
+}
+
+.mail-editor-modal {
+  overflow: auto;
+  width: auto;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  &.modal-body {
+    padding: 0px;
+    height: calc(~'100% - 39px');
+  }
+
+  .mailbox-attachments {
+    &:extend(.list-unstyled);
+    display: flex;
+    flex-wrap: wrap;
+    .attachment {
+      display: flex;
+      width: 140px;
+      height: 47px;
+      border: 1px solid #eee;
+      margin-bottom: 10px;
+      margin-right: 10px;
+    }
+  }
+  .mailbox-attachment-name {
+    font-weight: bold;
+    color: @gray40;
+  }
+  .mailbox-attachment-icon,
+  .mailbox-attachment-info,
+  .mailbox-attachment-size {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .mailbox-attachment-info {
+    padding: 5px;
+    background-color: @box-border-color;
+  }
+  .mailbox-attachment-size {
+    color: @btn-color;
+    font-size: 12px;
+    float: left;
+  }
+  .mailbox-attachment-icon {
+    min-width: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 23px;
+    color: @gray40;
+    height: 45px;
+  }
+  .mailbox-attachment-remove_icon {
+    display: inline-flex;
+    background-color: @box-border-color;
+    padding: 0 4px;
+
+    & .fa-close {
+      align-self: center;
+      cursor: pointer;
+    }
+
+    & .fa-close:hover {
+      opacity: .8;
+    }
+  }
+
+  // Loader which we are showing after adding attachment.
+  .loader {
+    margin: 0 10px;
+  }
+
+  // .modal-move > .modal-content > .modal-body
+
+  .input-wrap {
+    margin: 0;
+    padding: 0 10px;
+    background-color: @gray-light;
+    border-bottom: 1px solid @gainsboro;
+
+    .recipients, .subject {
+      outline: none;
+      width: 100%;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 40px;
+      border: none;
+      font-size: 12px;
+
+      .placeholder {
+        color: @purple;
+        font-size: 12px;
+        margin-right: 5px;
+
+      }
+
+      .input {
+        flex: 1;
+        background-color: @gray-light;
+        border: none;
+        outline: none;
+
+      }
+
+      .cc {
+        color: @gray45;
+
+        .show-cc-bcc {
+          color: @gray45;
+        }
+      }
+
+      .recipients-input {
+        background-color: @gray-light;
+      }
+
+      .fa-close {
+        cursor: pointer;
+      }
+    }
+
+    &.footer {
+      padding: 7px 10px;
+      border-bottom: none;
+
+      .footer-item {
+        margin: 0 0 0 10px;
+      }
+
+      .follow-up {
+        .ngx-picker {
+          input {
+            padding: 3px 10px;
+          }
+
+          .calendar {
+            top: auto;
+            bottom: 0;
+          }
+        }
+      }
+
+      .show-more-options {
+        position: relative;
+        margin-left: 13px;
+
+        .dropdown-menu {
+          padding: 0;
+          min-width: 210px;
+          .dropdown-item {
+            width: 100%;
+            height: auto;
+            padding: 0;
+            position: relative;
+
+            .nested-dropdown {
+              right: -210px;
+              bottom: -3px;
+            }
+
+            a {
+              position: relative;
+              display: block;
+              width: 100%;
+              text-decoration: none;
+              color: #4A4A4A;
+              font-size: 14px;
+              height: 30px;
+              line-height: 30px;
+              border-radius: 0;
+              .light-font;
+              padding: 0 10px;
+
+              &.active, &.active:hover, &.active:focus, &.active:active {
+                background-color: #E8E8E8;
+                .semibold-font;
+              }
+
+              &:hover {
+                cursor: pointer;
+                background-color: #eee;
+              }
+
+              i {
+                line-height: 30px;
+                color: @gray45;
+                display: inline-block;
+                vertical-align: middle;
+              }
+            }
+
+            img {
+              border-radius: 50%;
+              width: 35px;
+              margin-right: 5px;
+              border: 2px solid @nobel;
+            }
+          }
+
+        }
+
+      }
+
+      .fa {
+        color: @nobel;
+        cursor: pointer;
+        line-height: 27px;
+
+        &:hover {
+          color: @purple;
+        }
+        &.fa-1-5x {
+          font-size: 1.5em;
+        }
+
+        &.fa-paperclip {
+          transform: rotate(45deg);
+        }
+      }
+
+    }
+  }
+
+  .box-footer {
+    background-color: @gray-light;
+    border: none;
+  }
+
+  .text-editor-wrap {
+    display: flex;
+    flex-grow: 1;
+
+    text-editor {
+      display: flex;
+      flex: 1;
+
+      .mce-tinymce {
+        display: flex;
+        flex: 1;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+      }
+    }
+
+    .mce-container-body.mce-stack-layout {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+
+
+      .mce-stack-layout-item {
+        order: 1;
+      }
+      >.mce-toolbar-grp {
+        order: 1;
+        border-top: 1px solid @gainsboro;
+      }
+
+      >.mce-edit-area {
+        height: 100%;
+        overflow: scroll;
+        order: 0;
+        border: 0;
+      }
+
+      .mce-panel, .mce-btn {
+        background-color: @white;
+      }
+
+      .mce-btn {
+        border: none;
+
+        .mce-ico {
+          color: rgba(0,0,0,0.38);
+          &:hover {
+            color: rgba(0,0,0,0.54);
+          }
+        }
+        &.mce-active {
+          border: none;
+          .mce-ico {
+            color: rgba(0,0,0,0.54);
+
+          }
+        }
+      }
+    }
+  }
+
+  .contacts {
+    width: calc(100% - 1px);
+    top: auto;
+    left: 4px;
+    right: 2px;
+    a {
+      cursor: pointer;
+    }
+
+    app-user-avatar, .user-image {
+      height: 25px;
+      width: 25px;
+      line-height: 25px;
+      margin-right: 10px;
+    }
+  }
+
+  .row.user-action {
+    margin: auto 0;
+  }
+
+  .box {
+    margin-bottom: 0 !important;
+  }
+
+  button.btn {
+    font-size: 12px;
+    &:focus {
+      outline: none;
+    }
+
+    i.fa.fa-trash-o {
+      line-height: normal;
+    }
+
+    &.btn-default {
+      padding: 4px 10px;
+    }
+
+    &.btn-primary {
+      background-color: @badge-color;
+      padding: 4px 19px;
+      border-radius: 2px;
+    }
+  }
+}
+
+.box-mail-discover {
+  position: sticky;
+  top: 0;
+  padding-top: 10px;
+  z-index: 10;
+  background-color: @white;
+}
+
+.box-body {
+  overflow: visible !important;
+}
+
+.no-grow {
+  height: auto;
+  overflow: visible;
+  min-height: 200px;
+}
+
+.modal-header {
+  padding: 10px;
+  display: flex;
+}
+
+.modal-title {
+  width: calc(100% - 1px);
+}
+
+// TODO: Recheck all class and remove unused
+.modal-body {
+
+
+    .contacts {
+      width: calc(100% - 1px);
+      top: auto;
+      left: 4px;
+      right: 2px;
+      a {
+        cursor: pointer;
+      }
+
+      app-user-avatar, .user-image {
+        height: 25px;
+        width: 25px;
+        line-height: 25px;
+        margin-right: 10px;
+      }
+    }
+
+    .dropdown-item {
+      width: 100%;
+      height: auto;
+
+      a {
+        align-items: center;
+        display: flex;
+        height: 38px;
+        width: 100%;
+      }
+
+      img {
+        border-radius: 50%;
+        width: 35px;
+        margin-right: 5px;
+        border: 2px solid @nobel;
+      }
+    }
+
+    .row.user-action {
+      margin: auto 0;
+    }
+  }
+  // End - Recheck all class and remove unused
+
+.ui-resizable-se {
+  bottom: -2px;
+  right: -2px;
+}

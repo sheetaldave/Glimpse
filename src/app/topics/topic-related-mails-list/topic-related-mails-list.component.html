@@ -1,0 +1,144 @@
+<div class="inbox_menu">
+  <span *ngIf="!minimizedMailboxMenu">Inbox</span><span *ngIf="minimizedMailboxMenu">Related Mails</span>
+  <div class="form-group text-right inbox-select-div">
+    <span *ngIf="folder !== 'search'"  class="topic-messages-filter" dropdown container="body" placement="bottom right">
+      <a dropdownToggle class="dropdown-toggle" (click)="false">
+        Sort by: {{ selectedOrder ? ' ' + selectedOrder : ' '  }} <i class="fa fa-caret-down"></i>
+      </a>
+      <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+        <li role="menuitem" *ngFor="let order of orders"><a class="dropdown-item" (click)="selectOrder(order)">{{ order }}</a></li>
+      </ul>
+    </span>
+  </div>
+</div>
+<div *ngIf="messages">
+  <div class="block-section line clearfix"
+       *ngFor="let message of messages ; let i=index"
+       [class.selected]="message === selectedMessage"
+       [class.unread]="message.unread"
+        dnd-draggable
+       [dragEnabled]="true"
+       [dropZones]="['folder']"
+       [dragData]="[message]"
+       [contextMenu]="SenderInfoMenu"
+       [contextMenuSubject]="message">
+    <div class="col-md-3 mail-list-avatar">
+      <div class="mail-list-item connection-list-item"
+           infinite-scroll
+           (scrolled)="loadMoreMessages()">
+        <div class="box-line">
+          <div class="img-info-wrap">
+            <div class="user-info">
+              <div class="user-name">
+                <p>
+                  <b> {{message.from.name}} </b>
+                </p>
+              </div>
+              <div class="user-date">{{message.sentTime | mailDate }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <context-menu #SenderInfoMenu>
+      <ng-template contextMenuItem  (execute)="copyToClipBoard($event.item.from.email)" >
+        Copy Email Address
+      </ng-template>
+      <ng-template contextMenuItem (execute)="composeNewMessage($event.item.from)">
+       New Email
+      </ng-template>
+      <ng-template contextMenuItem>
+        Add to Contacts
+      </ng-template>
+      <ng-template contextMenuItem >
+        Send contact as vCard
+      </ng-template>
+      <ng-template contextMenuItem >
+        Prioritize alerts
+      </ng-template>
+      <ng-template contextMenuItem (execute)="showRelatedTopics($event.item.from.email)">
+        Related Topics
+      </ng-template>
+      <ng-template contextMenuItem (execute)="showRelatedEmails($event.item.from.email)">
+        Search for   "{{message.from.name}}"
+      </ng-template>
+    </context-menu>
+    <div class="col-md-7 mail-list-content padding-zero">
+      <div class="user-topics" [ngClass]="{'no-topic' :!message.topics.length}">
+        <p class="user-topics-title">
+          <b (click)="selectForModal(message)"> {{message.subject}} </b>
+        </p>
+        <p *ngIf="message.topics.length === 0">No topics found </p>
+        <ul class="list-inline" [ngClass]="{'show-hide':i === selectedIndex && show }">
+          <li *ngFor="let topic of message.topics">
+            <a> {{topic.name}} </a>
+          </li>
+          <a class="show-more" *ngIf="message.topics.length" (click)="showTopics(i)"> {{i === selectedIndex && show ? 'Less..' : 'More...'}} </a>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-2 mail-list-icons padding-zero">
+      <div class="box-header with-border">
+        <div class="box-tools btn-group" dropdown>
+          <button class="btn btn-box-tool btn-default btn-sm" type="button"
+          (click)="reply(message)">
+            <i class="fa fa-reply"></i>
+          </button>
+          <button dropdownToggle
+                  type="button"
+                  class="btn  dropdown-toggle dropdown-toggle-split btn-box-tool btn-default btn-sm">
+            <i class="fa fa-caret-down fa-2x"></i>
+          </button>
+          <ul *dropdownMenu class="dropdown-menu context-menu-dropdown" role="menu">
+            <li role="menuitem"
+                class="dropdown-item"
+                (click)="snoozeMessage(message)">
+              <i class="fa fa-bell" aria-hidden="true"></i>
+              Snooze
+            </li>
+            <li role="menuitem"
+                class="dropdown-item"
+                *ngIf="message.participants.length > 2;"
+                (click)="replyAll(message)">
+              <i class="fa fa-mail-reply-all"></i>
+              Reply All
+            </li>
+            <li role="menuitem"
+                class="dropdown-item"
+                (click)="forwardMessage(message)">
+              <i class="fa fa-mail-forward"></i>
+              Forward
+            </li>
+            <li role="menuitem"
+                class="dropdown-item"
+                (click)="moveMessageToSpam(message)">
+              <i class="fa fa-exclamation-triangle"></i>
+              Move to Spam
+            </li>
+            <li role="menuitem"
+                class="dropdown-item"
+                (click)="deleteMessage(message)">
+              <i class="fa fa-trash-o"></i>
+              Delete
+            </li>
+          </ul>
+          <div class="btn-group btn-delete">
+            <button class="btn btn-box-tool btn-sm" type="button"
+                    (click)="starMessage(message)">
+              <i class="fa fa-star-o"></i>
+            </button>
+            <button class="btn btn-box-tool btn-sm" type="button"
+                    (click)="deleteMessage(message)">
+              <i class="fa fa-trash"></i>
+            </button>
+            <button class="btn btn-box-tool btn-sm" type="button">
+              <span *ngIf="message.files.length>0"><i class="fa fa-paperclip"></i></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="box" *ngIf="(selectedTopic || selectedContact) && messages?.length < 1 && !loading">You don't have messages</div>
+<div class="loader" *ngIf="loading"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></div>

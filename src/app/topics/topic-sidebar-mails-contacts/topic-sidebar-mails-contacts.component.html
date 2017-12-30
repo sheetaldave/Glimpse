@@ -1,0 +1,75 @@
+<split direction="horizontal" [visibleTransition]="true" [gutterSize]="2">
+  <split-area [size]="splitSizes.sidebar">
+    <aside>
+      <app-topic-side-bar [(minimizedMailboxMenu)]="minimizedMailboxMenu"></app-topic-side-bar>
+    </aside>
+  </split-area>
+  <split-area [size]="splitSizes.mailList">
+    <app-topic-related-mails-list
+      [(selectedTopic)]=selectedTopic
+      [(query)]="query"
+      [(selectedContact)]="selectedContact"
+      [(messages)]="messages"
+      [(minimizedMailboxMenu)]="minimizedMailboxMenu"></app-topic-related-mails-list>
+  </split-area>
+  <split-area [size]="splitSizes.contactList">
+    <div class="left-side-hr">
+      <div class="connection">
+        <div class="content">
+          <div class="box-bg-white">
+            <div class="box-body box-group">
+              <div class="div-title">
+                <h3 class="connection-title">Your Connections</h3>
+                <span class="total-connnections">{{totalConnections}}</span>
+              </div>
+              <div *ngFor="let con of connections"
+                   class="line mail-list-item connection-list-item"
+                   [contextMenu]="ConnectionsMenu"
+                   [contextMenuSubject]="con">
+                <div class="box-line">
+                  <div class="img-info-wrap">
+                    <app-user-avatar [contact]="con" [contextMenu]="true"></app-user-avatar>
+                    <div class="user-info">
+                      <div class="user-name">
+                        <p>
+                          <b> {{ con.name }} </b>
+                        </p>
+                      </div>
+                      <div class="user-email">{{con.email}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <context-menu #ConnectionsMenu>
+                <ng-template contextMenuItem (execute)="composeNewMessage($event.item)">
+                  Send Email
+                </ng-template>
+                <ng-template contextMenuItem (execute)="selectContact($event.item)">
+                  Related Emails
+                </ng-template>
+                <ng-template contextMenuItem (execute)="showRelatedAttachments($event.item.name)">
+                  Related Attachments
+                </ng-template>
+                <ng-template contextMenuItem (execute)="openKnowledgepane($event.item)">
+                 Show in Knowledge Pane
+                </ng-template>
+              </context-menu>
+              <div class="box" *ngIf="selectedTopic && totalConnections === 0">
+                <div class="box-body">No Connections Found</div>
+              </div>
+              <div class="col-md-12 pull-right load-more-btn">
+                <a (click)="getMoreContacts()"
+                   class="btn-info btn pull-right"
+                   *ngIf="connections && (connections.length < totalConnections)"
+                >Load More</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </split-area>
+</split>
+
+
+

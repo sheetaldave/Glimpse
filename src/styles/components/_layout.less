@@ -1,0 +1,109 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  box-sizing: inherit;
+  color: @body-color;
+  font-size: 13px;
+  .regular-font;
+}
+
+body {
+  min-width: 1024px;
+}
+
+blockquote {
+  font-size: 13px;
+  .regular-font;
+}
+
+.wrapper {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.content-wrapper {
+  height: calc(~"100% - 54px");
+  width: 100%;
+}
+
+.content {
+  padding: 0 5px;
+  &.with-padding {
+    padding: 5px;
+  }
+}
+
+split-gutter {
+  z-index: 10;
+  opacity: 0;
+}
+
+split-gutter:hover {
+  opacity: 1;
+}
+
+split-area::-webkit-scrollbar {
+  display: none;
+}
+
+aside {
+  height: 100%;
+  background: @gray-light;
+}
+
+main {
+  height: 100%;
+}
+
+// Unstyled List
+.list-unstyled {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.loader {
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.user-image {
+  border-radius: 50%;
+  color: @white;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #9B9B9B;
+}
+
+dd, dt {
+  line-height: 2;
+}
+
+.m-sm {
+  margin: 10px;
+}
+.p-xxs {
+  padding: 5px;
+}
+
+h5 {
+  color: @violet;
+  .semibold-font;
+  font-size: 12px;
+}
+
+.placeholder {
+  color: #c3c3c3;
+  font-size: 11px;
+}
+
+.text-no-select {
+  -webkit-touch-callout: none;  /* iOS Safari */
+  -webkit-user-select: none;    /* Safari */
+  -khtml-user-select: none;     /* Konqueror HTML */
+  -moz-user-select: none;       /* Firefox */
+  -ms-user-select: none;        /* Internet Explorer/Edge */
+  user-select: none;            /* Non-prefixed version, currently supported by Chrome and Opera */
+}

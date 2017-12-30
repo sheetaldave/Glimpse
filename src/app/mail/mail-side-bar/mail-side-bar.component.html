@@ -1,0 +1,110 @@
+<section class="sidebar" *ngIf="minimizeMenu" [ngClass]="{active: minimizeMenu}">
+  <li class="bg-purple-active" (click)="composeNewMessage($event)">
+    <a><i *ngIf="minimizeMenu" class="fa fa-envelope fa-big"></i></a>
+  </li>
+  <ul class="nav nav-pills nav-stacked minimized" *ngIf="folders">
+    <li *ngFor="let folder of defaultFolders"
+        dnd-droppable
+        [dropZones]="['folder']"
+        [allowDrop]="allowDropFolder(folder)"
+        (onDropSuccess)="handleDrop($event, folder.id)">
+      <a [routerLink]="['/mail', folder.id]" routerLinkActive="active">
+        <i class="fa fa-big fa-{{folder.icon}}"></i>
+      </a>
+    </li>
+    <li class="divider"></li>
+    <li dropdown
+        [isOpen]="isOpenDropdownFolders"
+        (isOpenChange)="changeDropdownFolders($event)"
+        container="body"
+        placement="right"
+        dnd-droppable
+        [dropZones]="['folder']"
+        (onDragOver)="isOpenDropdownFolders = true">
+      <a href dropdownToggle (click)="false"><i class="fa fa-big fa-folder"></i></a>
+      <app-mail-folder-dropdown
+        [folders]="userFolders"
+        [showCreateFolderButton]="true"
+        (onCreateFolder)="createFolder()"
+        (onMoveFolder)="handleDrop($event.event, $event.folder.id)">
+      </app-mail-folder-dropdown>
+    </li>
+  </ul>
+  <div class="loader" *ngIf="loading"><i class="fa fa-refresh fa-spin fa-2x fa-fw"></i></div>
+</section>
+
+<section class="sidebar" *ngIf="!minimizeMenu">
+  <div (click)="composeNewMessage($event)" class="btn btn-default btn-block btn-compose">
+    <span> <i class="fa fa-envelope"></i> </span>
+    <span>Compose</span>
+  </div>
+  <ul class="nav nav-pills nav-stacked" *ngIf="folders">
+    <li
+        *ngFor="let folder of defaultFolders"
+        dnd-droppable
+        [dropZones]="['folder']"
+        [allowDrop]="allowDropFolder(folder)"
+        (onDropSuccess)="handleDrop($event, folder.id)">
+      <a [routerLink]="['/mail', folder.id]" routerLinkActive="active">
+        <span class="folder-name-wrap"><i class="fa fa-{{folder.icon}} fa-fw"></i>{{folder.name}}</span>
+        <span class="badge pull-right" *ngIf="folder.unreadMails">{{folder.unreadMails}}</span>
+      </a>
+    </li>
+    <li class="divider"></li>
+    <li>
+      <span class="just-text">
+        <span class="folder-name-wrap"><i class="fa fa-folder fa-fw"></i><span class="title">Folders</span></span>
+        <div class="pull-right">
+            <button class="btn btn-link btn-create-folder" (click)="createFolder($event)"><i class="fa fa-plus-circle"></i></button>
+          </div>
+      </span>
+    </li>
+    <li>
+      <ng-template #foldersList let-currentFolders>
+        <ul class="user-folders">
+          <li *ngFor="let folder of currentFolders">
+            <a [routerLink]="['/mail', folder.id]"
+               routerLinkActive="active"
+               [contextMenu]="folderContext"
+               [contextMenuSubject]="folder"
+               dnd-droppable
+               [dropZones]="['folder']"
+               (onDropSuccess)="handleDrop($event, folder.id)">
+              <div class="caret-folder"></div>
+              <span class="folder-name-wrap">{{folder.name}}</span>
+              <span class="badge pull-right" *ngIf="folder.unreadMails">{{folder.unreadMails}}</span>
+            </a>
+            <button class="btn btn-link"
+                    *ngIf="folder?.sub_folders && folder.sub_folders.length > 0"
+                    (click)="openFolder(folder)">
+              <i class="fa fa-fw" [ngClass]="{'fa-caret-right': !folder.open, 'fa-caret-down': folder.open}"></i>
+            </button>
+            <ng-container *ngIf="folder?.sub_folders && folder.open">
+                <ng-container class="subfolders-list" *ngTemplateOutlet="foldersList; context:{ $implicit: folder.sub_folders }"></ng-container>
+            </ng-container>
+          </li>
+        </ul>
+      </ng-template>
+      <ng-container *ngTemplateOutlet="foldersList; context:{ $implicit: userFolders }"></ng-container>
+    </li>
+  </ul>
+  <div class="loader" *ngIf="loading"><i class="fa fa-refresh fa-spin fa-2x fa-fw"></i></div>
+ <div class="btm-fixed-label" *ngIf="selectedFolder">
+   <p>
+     <span class="fixed-name">{{selectedFolder.name}}:&nbsp;</span>
+     <span class="badge-num">{{selectedFolder.totalMails}}</span>
+   </p>
+ </div>
+</section>
+
+<context-menu #folderContext>
+  <ng-template contextMenuItem (execute)="renameFolder($event.item)">
+    <i class="fa fa-long-arrow-left"></i>
+    Rename folder
+  </ng-template>
+
+  <ng-template contextMenuItem (execute)="deleteFolder($event.item)">
+    <i class="fa fa-trash-o"></i>
+    Delete folder
+  </ng-template>
+</context-menu>
