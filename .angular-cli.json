@@ -1,0 +1,76 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "project": {
+    "name": "deepmail"
+  },
+  "apps": [
+    {
+      "root": "src",
+      "outDir": "dist",
+      "assets": [
+        "assets",
+        "favicon.ico",
+        { "glob": "**/*", "input": "./push-notifications/", "output": "./" }
+      ],
+      "index": "index.html",
+      "main": "main.ts",
+      "polyfills": "polyfills.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.app.json",
+      "testTsconfig": "tsconfig.spec.json",
+      "prefix": "app",
+      "styles": [
+        "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+        "../node_modules/font-awesome/css/font-awesome.css",
+        "../node_modules/jquery-ui-dist/jquery-ui.css",
+        "../node_modules/ngx-datetime-picker/ngx-datetimepicker/src/assets/ngx-datetime-picker.css",
+        "styles/styles.less",
+        "fonts/fonts.less"
+      ],
+      "scripts": [
+        "3rdparty/caja.js",
+        "../node_modules/tinymce/tinymce.js",
+        "../node_modules/tinymce/themes/modern/theme.js",
+        "../node_modules/tinymce/plugins/link/plugin.js",
+        "../node_modules/tinymce/plugins/paste/plugin.js",
+        "../node_modules/tinymce/plugins/table/plugin.js",
+        "../node_modules/tinymce/plugins/autoresize/plugin.js",
+        "../node_modules/jquery-ui-dist/external/jquery/jquery.js",
+        "../node_modules/jquery-ui-dist/jquery-ui.js"
+      ],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      }
+    }
+  ],
+  "addons": [
+    "../node_modules/font-awesome/fonts/*.+(otf|eot|svg|ttf|woff|woff2)"
+  ],
+  "e2e": {
+    "protractor": {
+      "config": "./protractor.conf.js"
+    }
+  },
+  "lint": [
+    {
+      "project": "src/tsconfig.app.json"
+    },
+    {
+      "project": "src/tsconfig.spec.json"
+    },
+    {
+      "project": "e2e/tsconfig.e2e.json"
+    }
+  ],
+  "test": {
+    "karma": {
+      "config": "./karma.conf.js"
+    }
+  },
+  "defaults": {
+    "styleExt": "less",
+    "component": {}
+  }
+}
